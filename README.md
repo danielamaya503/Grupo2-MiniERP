@@ -1,5 +1,15 @@
-# Grupo2-MiniERP
-Mini ERP para microempresa  Módulos: clientes, proveedores, compras, ventas, inventario, cuentas por cobrar/pagar, y reportes. Requiere reglas fuertes de negocio y auditoría de cambios.
+TechCore Mini ERP es un sistema de gestión empresarial diseñado para pequeñas y medianas empresas que necesitan mejorar el control de sus operaciones comerciales y administrativas. El proyecto busca centralizar procesos como ventas al contado y al crédito, gestión de inventario, compras a proveedores y seguimiento de cuentas por cobrar, con información actualizada en tiempo real.
+
+Los módulos principales del sistema incluyen usuarios y autenticación, productos, inventario, ventas, clientes, compras, reportes y auditoría. También incorpora funciones financieras para planes de pago, abonos, cuotas vencidas y estado de cuenta, apoyadas por vistas y lógica de base de datos.
+
+Tecnologías
+El proyecto está construido con ASP.NET Core 10.0, Entity Framework Core 10.0.3 y SQL Server como base tecnológica principal. En la parte visual se documenta el uso de Tailwind CSS 4.2 y DaisyUI 5.5, dentro de una arquitectura basada en el patrón MVC.
+
+Arquitectura
+La estructura del proyecto sigue una organización por capas con carpetas como Controllers, Models, Datos, Views, ViewModels, Interfaces, Concretes y wwwroot. Además, la solución aprovecha características avanzadas de SQL Server como triggers, vistas, índices y restricciones, para reforzar la lógica del negocio y la integridad de los datos.
+
+
+#GUIA PARA USAR GIT
 
 Configuración Inicial
 Instala Git y configura tu identidad global una sola vez.
