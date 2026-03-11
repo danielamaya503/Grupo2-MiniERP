@@ -1,19 +1,26 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TechCore.Models;
 
+[Table("abonosVentas")]
 public partial class AbonosVenta
 {
-    public int Id { get; set; }
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    [Column("Id")]
+    public int IdAbonosVenta { get; set; }
 
-    public string Norden { get; set; } = null!;
+    [MaxLength(50)]
+    public string Norden { get; set; } = string.Empty;
 
-    public DateTime? Fecha { get; set; }
-
+    public DateTime? Fecha { get; set; } = DateTime.Now;
+    [Precision(18,2)]
     public decimal Monto { get; set; }
-
     public int NumeroCuota { get; set; }
 
-    public virtual Venta NordenNavigation { get; set; } = null!;
+    public Venta? NordenNavigation { get; set; }
 }

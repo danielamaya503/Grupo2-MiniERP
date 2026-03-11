@@ -1,23 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TechCore.Models;
 
+[Table("proveedores")]
 public partial class Proveedore
 {
-    public string Codprovee { get; set; } = null!;
-
-    public string Nombre { get; set; } = null!;
-
+    [Key]
+    [MaxLength(50)]
+    public string Codprovee { get; set; } = string.Empty;
+    [MaxLength(200)]
+    public string Nombre { get; set; } = string.Empty;
+    [Phone]
+    [MaxLength(15)]
     public string? Telefono { get; set; }
-
+    [EmailAddress]
+    [MaxLength(200)]
     public string? Email { get; set; }
-
+    [MaxLength(300)]
     public string? Direccion { get; set; }
 
-    public int? Estado { get; set; }
+    public int Estado { get; set; } = 1;
 
-    public DateTime? CreatedDate { get; set; }
+    public DateTime? CreatedDate { get; set; } = DateTime.Now;
 
-    public virtual ICollection<Compra> Compras { get; set; } = new List<Compra>();
+    public virtual List<Compra> Compras { get; set; } = [];
 }

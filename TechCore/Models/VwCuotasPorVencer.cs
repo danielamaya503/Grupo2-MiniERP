@@ -5,9 +5,9 @@ namespace TechCore.Models;
 
 public partial class VwCuotasPorVencer
 {
-    public string Norden { get; set; } = null!;
+    public string Norden { get; set; } = string.Empty;
 
-    public string Cliente { get; set; } = null!;
+    public string Cliente { get; set; } = string.Empty;
 
     public int NumeroCuota { get; set; }
 
