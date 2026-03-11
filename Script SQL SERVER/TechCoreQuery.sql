@@ -14,6 +14,22 @@ CREATE TABLE rol(
 )
 GO
 
+IF NOT EXISTS (SELECT 1 FROM rol WHERE nombreRol = 'Administrador')
+    INSERT INTO rol (nombreRol) VALUES ('Administrador');
+go
+IF NOT EXISTS (SELECT 1 FROM rol WHERE nombreRol = 'Vendedor')
+    INSERT INTO rol (nombreRol) VALUES ('Vendedor');
+go
+IF NOT EXISTS (SELECT 1 FROM rol WHERE nombreRol = 'Bodega')
+    INSERT INTO rol (nombreRol) VALUES ('Bodega');
+go
+IF NOT EXISTS (SELECT 1 FROM rol WHERE nombreRol = 'Contador')
+    INSERT INTO rol (nombreRol) VALUES ('Contador');
+go
+
+select * from rol
+go
+
 -----------------------------------------------------
 -- TABLA USERS
 -----------------------------------------------------
@@ -30,6 +46,8 @@ CREATE TABLE users(
     FOREIGN KEY (idrol) REFERENCES rol(id)
 )
 GO
+
+
 
 -----------------------------------------------------
 -- CLIENTES
