@@ -47,7 +47,17 @@ CREATE TABLE users(
 )
 GO
 
-
+INSERT INTO users (code, nombre, username, pwd, phone, idrol, email)
+VALUES (
+    'USR-001',
+    'Administrador TechCore',
+    'admin',
+    '$2a$11$S14bynqUvQmnTymkQHe9eOzbDJTWhYetiDbrScRYVPz8OSwSoIWvG',
+    '0000-0000',
+    (SELECT id FROM rol WHERE nombreRol = 'Administrador'),
+    'admin@techcore.com'
+);
+go
 
 -----------------------------------------------------
 -- CLIENTES
