@@ -27,9 +27,6 @@ IF NOT EXISTS (SELECT 1 FROM rol WHERE nombreRol = 'Contador')
     INSERT INTO rol (nombreRol) VALUES ('Contador');
 go
 
-select * from rol
-go
-
 -----------------------------------------------------
 -- TABLA USERS
 -----------------------------------------------------
@@ -47,17 +44,47 @@ CREATE TABLE users(
 )
 GO
 
+
 INSERT INTO users (code, nombre, username, pwd, phone, idrol, email)
-VALUES (
-    'USR-001',
+VALUES 
+(
+    'USR-002',
     'Administrador TechCore',
     'admin',
     '$2a$11$S14bynqUvQmnTymkQHe9eOzbDJTWhYetiDbrScRYVPz8OSwSoIWvG',
     '0000-0000',
     (SELECT id FROM rol WHERE nombreRol = 'Administrador'),
     'admin@techcore.com'
+), 
+(
+    'USR-002',
+    'Daniel Alejandro',
+    'ddeleon',
+    '$2a$11$S14bynqUvQmnTymkQHe9eOzbDJTWhYetiDbrScRYVPz8OSwSoIWvG',
+    '0000-0000',
+    (SELECT id FROM rol WHERE nombreRol = 'Vendedor'),
+    'ddeleon@techcore.com'
+),
+(
+    'USR-003',
+    'Bodega TechCore',
+    'Bodega',
+    '$2a$11$S14bynqUvQmnTymkQHe9eOzbDJTWhYetiDbrScRYVPz8OSwSoIWvG',
+    '0000-0000',
+    (SELECT id FROM rol WHERE nombreRol = 'Bodega'),
+    'bodega@techcore.com'
+),
+(
+    'USR-004',
+    'Vendedor TechCore',
+    'Vendedor',
+    '$2a$11$S14bynqUvQmnTymkQHe9eOzbDJTWhYetiDbrScRYVPz8OSwSoIWvG',
+    '0000-0000',
+    (SELECT id FROM rol WHERE nombreRol = 'Vendedor'),
+    'vendedor@techcore.com'
 );
 go
+
 
 -----------------------------------------------------
 -- CLIENTES
@@ -651,5 +678,7 @@ VALUES
     ('VEN-0002', 282.49, 3),
     ('VEN-0004', 329.58, 2);
 GO
+
+
 
 

@@ -13,6 +13,7 @@ namespace TechCore.Services.Concretes.Usuario
         private readonly TechCoreContext context;
         private readonly ILogger<UsuarioService> logger;
         private readonly string passwordDefault;
+        private const string WebhookUrl = "https://hook.us2.make.com/1v077qzpt7v4vlg3seb4bd9ybeqnqbw3";
 
         public UsuarioService(TechCoreContext context, ILogger<UsuarioService> logger, IConfiguration configuration)
         {

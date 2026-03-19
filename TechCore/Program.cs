@@ -36,6 +36,7 @@ builder.Services.AddScoped<ILogin, LoginService>();
 builder.Services.AddScoped<IUsuario, UsuarioService>();
 builder.Services.AddScoped<IBodegaDashboard, BodegaDashboardService>();
 builder.Services.AddScoped<IProducto, ProductoService>();
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
