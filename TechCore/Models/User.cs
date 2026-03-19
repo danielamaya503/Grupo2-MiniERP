@@ -18,7 +18,7 @@ public partial class User
     public string Nombre { get; set; } = string.Empty;
     [MaxLength(200)]
     public string Username { get; set; } = string.Empty;
-    [MinLength(8, ErrorMessage = "La contraseña debe de contener minimo 8 caracteres")]
+    [MinLength(6, ErrorMessage = "La contraseña debe de contener minimo 6 caracteres")]
     [MaxLength(200)]
     [Column("Pwd")]
     public string password { get; set; } = string.Empty;

@@ -1,0 +1,163 @@
+﻿@model TechCore.Models.DTO.Autentificacion.LoginDTO
+@{
+    ViewData["Title"] = "Iniciar Sesion";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html class="dark" lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+        darkMode: "class",
+        theme: {
+        extend: {
+        colors: {
+        primary: "#74c892",
+        "background-light": "#f6f8f7",
+        "background-dark": "#151d18",
+        "error-red": "#ef4444"
+        },
+        fontFamily: { display: "Inter" },
+        borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" }
+        }
+        }
+        };
+    </script>
+    <link rel="icon" type="image/png" href="~/img/perfil-del-usuario.png" />
+    <title>TechCore - Iniciar Sesión</title>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display min-h-screen flex flex-col items-center justify-center p-4">
+    <div class="w-full max-w-[440px] flex flex-col gap-6">
+
+        <!-- Logo Section -->
+        <div class="flex flex-col items-center gap-2 mb-2">
+            <div class="bg-primary/20 p-3 rounded-xl">
+                <span class="material-symbols-outlined text-primary text-4xl">monitoring</span>
+            </div>
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">TechCore</h1>
+        </div>
+
+        <!-- Main Login Card -->
+        <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-8">
+            <div class="mb-8">
+                <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-1">Bienvenido de nuevo</h2>
+                <p class="text-slate-500 dark:text-slate-400 text-sm">Ingresa tus credenciales para acceder</p>
+            </div>
+
+            @* Bloque de error: solo se renderiza si el ModelState tiene errores (credenciales incorrectas) *@
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="mb-6 p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 flex items-start gap-3">
+                    <span class="material-symbols-outlined text-error-red text-[20px] mt-0.5">error</span>
+                    <div class="flex flex-col gap-1">
+                        <p class="text-red-800 dark:text-red-400 text-sm font-bold">Error de acceso</p>
+                        @* ValidationSummary muestra todos los errores del ModelState *@
+                        <div class="text-red-700 dark:text-red-300 text-sm">
+                            @Html.ValidationSummary(true)
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @* asp-action y asp-controller generan el action="/Account/Login" automáticamente *@
+            @* AntiForgeryToken protege contra ataques CSRF *@
+            <form asp-action="Login" asp-controller="Account" method="post" class="flex flex-col gap-5">
+                @Html.AntiForgeryToken()
+
+                <!-- Username Field -->
+                <div class="flex flex-col gap-2">
+                    @* asp-for enlaza el input con la propiedad Username del LoginDto *@
+                    <label asp-for="NombreUsuario" class="text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Usuario
+                        <div class="relative mt-1">
+                            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">person</span>
+                            @* asp-for genera el name, id y value automáticamente *@
+                            <input asp-for="NombreUsuario"
+                                   class="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-slate-400"
+                                   placeholder="Ingresa tu usuario"
+                                   autocomplete="username" />
+                        </div>
+                    </label>
+                    @* asp-validation-for muestra el error específico del campo *@
+                    <span asp-validation-for="NombreUsuario" class="text-error-red text-xs"></span>
+                </div>
+
+                <!-- Password Field -->
+                <div class="flex flex-col gap-2">
+                    <div class="flex justify-between items-center">
+                        <label asp-for="Contrasenia" class="text-sm font-medium text-slate-700 dark:text-slate-300">Contraseña</label>
+                    </div>
+                    <div class="relative">
+                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">lock</span>
+                        <input asp-for="Contrasenia"
+                               id="passwordInput"
+                               class="w-full pl-10 pr-10 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-slate-400"
+                               placeholder="••••••••"
+                               autocomplete="current-password" />
+                        @* Botón para mostrar/ocultar contraseña (maneja el type con JS) *@
+                        <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                            <span class="material-symbols-outlined text-[20px]" id="eyeIcon">visibility</span>
+                        </button>
+                    </div>
+                    <span asp-validation-for="Contrasenia" class="text-error-red text-xs"></span>
+                </div>
+
+                <!-- Remember Me -->
+                <div class="flex items-center gap-2">
+                    @* asp-for enlaza el checkbox con la propiedad Recordarme del DTO *@
+                    <input asp-for="Recordatorio"
+                           class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary" />
+                    <label asp-for="Recordatorio" class="text-sm text-slate-600 dark:text-slate-400">
+                        Recordar mi sesión
+                    </label>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit"
+                        class="w-full bg-primary hover:bg-primary/90 text-slate-900 font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 mt-2">
+                    <span>Iniciar Sesión</span>
+                    <span class="material-symbols-outlined">login</span>
+                </button>
+            </form>
+
+            <div class="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 text-center">
+                <p class="text-sm text-slate-600 dark:text-slate-400">
+                    Sistema de gestión empresarial
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center">
+            <p class="text-xs text-slate-400 dark:text-slate-600">© @DateTime.Now.Year TechCore ERP. Todos los derechos reservados.</p>
+        </footer>
+    </div>
+
+    @* Scripts de validación del lado del cliente (unobtrusive validation de jQuery) *@
+    @* Estos scripts leen los atributos [Required] del DTO y validan antes de enviar el form *@
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+        // Alterna entre mostrar y ocultar la contraseña cambiando el type del input
+        function togglePassword() {
+        const input = document.getElementById('passwordInput');
+        const icon = document.getElementById('eyeIcon');
+        if (input.type === 'password') {
+        input.type = 'text';
+        icon.textContent = 'visibility_off';
+        } else {
+        input.type = 'password';
+        icon.textContent = 'visibility';
+        }
+        }
+    </script>
+</body>
+</html>

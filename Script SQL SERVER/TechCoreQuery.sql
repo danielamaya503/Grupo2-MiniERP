@@ -401,6 +401,33 @@ BEGIN
 END
 GO
 
+-- TRIGGER: DISMINUIR STOCK AL VENDER
+CREATE OR ALTER TRIGGER TR_DisminuirStock
+ON ventasDetalle
+AFTER INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        UPDATE p
+        SET p.stock = p.stock - i.cantidad
+        FROM productos p
+        INNER JOIN inserted  i ON p.codprod  = i.codprod
+        INNER JOIN ventas    v ON v.norden   = i.norden
+        WHERE v.nula = 0;  -- Solo si la venta no está anulada
+
+    END TRY
+    BEGIN CATCH
+        DECLARE @ErrorMsg   NVARCHAR(4000) = ERROR_MESSAGE();
+        DECLARE @ErrorSev   INT            = ERROR_SEVERITY();
+        DECLARE @ErrorState INT            = ERROR_STATE();
+        RAISERROR(@ErrorMsg, @ErrorSev, @ErrorState);
+        ROLLBACK TRANSACTION;
+    END CATCH
+END
+GO
+
 
 
 -----------------------------------------------------
@@ -422,6 +449,31 @@ INNER JOIN clientes c ON v.codclien = c.codclien
 WHERE pp.pagada = 0
 AND pp.fechaVencimiento < GETDATE()
 AND v.nula = 0
+GO
+
+-- TRIGGER: AUMENTAR STOCK AL REGISTRAR UNA COMPRA
+CREATE OR ALTER TRIGGER TR_AumentarStock_Compra
+ON comprasDetalle
+AFTER INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        UPDATE p
+        SET p.stock = p.stock + i.cantidad
+        FROM productos p
+        INNER JOIN inserted i ON p.codprod = i.codprod;
+
+    END TRY
+    BEGIN CATCH
+        DECLARE @ErrorMsg   NVARCHAR(4000) = ERROR_MESSAGE();
+        DECLARE @ErrorSev   INT            = ERROR_SEVERITY();
+        DECLARE @ErrorState INT            = ERROR_STATE();
+        RAISERROR(@ErrorMsg, @ErrorSev, @ErrorState);
+        ROLLBACK TRANSACTION;
+    END CATCH
+END
 GO
 
 -----------------------------------------------------
@@ -462,3 +514,142 @@ WHERE v.tipoPago = 'CREDITO'
 AND v.nula = 0
 GROUP BY v.norden, c.nombre, v.total, v.saldo, v.meses
 GO
+
+
+
+
+-------------------------------------------------------
+-----------------INSERTAR REGISTROS--------------------
+-------------------------------------------------------
+
+-- CLIENTES
+-----------------------------------------------------
+INSERT INTO clientes (codclien, nombre, telefono, email, direccion)
+VALUES 
+    ('CLI-001', 'Juan Carlos Martínez',   '7890-1234', 'jcmartinez@gmail.com',    'Col. Escalón, San Salvador'),
+    ('CLI-002', 'María López de García',  '7654-3210', 'mlopez@hotmail.com',      'Res. Santa Elena, Antiguo Cuscatlán'),
+    ('CLI-003', 'Distribuidora El Sol',   '2222-5555', 'elsol@distribuidora.com', 'Blvd. Los Héroes, San Salvador'),
+    ('CLI-004', 'Roberto Flores',         '7111-2233', 'rflores@outlook.com',     'Col. Médica, San Salvador'),
+    ('CLI-005', 'TechSolutions SV S.A.',  '2289-4400', 'info@techsolutions.sv',   'Zona Rosa, San Salvador');
+GO
+
+
+
+-- CATEGORIA
+-----------------------------------------------------
+INSERT INTO categoria (codigo, nombre, descripcion)
+VALUES 
+    ('CAT-001', 'Laptops',        'Computadoras portátiles de diferentes marcas y gamas'),
+    ('CAT-002', 'Accesorios',    'Teclados, ratones, auriculares y accesorios de entrada'),
+    ('CAT-003', 'Monitores',      'Pantallas LED, IPS y gaming de diversas pulgadas'),
+    ('CAT-004', 'Almacenamiento', 'Discos duros HDD, SSD internos y externos'),
+    ('CAT-005', 'Redes',          'Routers, switches, cables y equipos de conectividad');
+GO
+
+-- PROVEEDORES
+-----------------------------------------------------
+INSERT INTO proveedores (codprovee, nombre, telefono, email, direccion)
+VALUES 
+    ('PROV-001', 'Ingram Micro SV',    '2222-1100', 'ventas@gmail.com',     'Atendido desde Miami / Canal digital'),
+    ('PROV-002', 'Tecno Avance S.A.',  '2222-7700', 'ventas@gmail.com',     'San Salvador, El Salvador'),
+    ('PROV-003', 'Solution Box SV',    '2222-6600', 'info@gmail.com.sv',    'C. Chaparrastique N°27, Zona Ind. Santa Elena, La Libertad'),
+    ('PROV-004', 'Intelmax SV',        '2222-3344', 'ventas@gmail.com.sv',     'Metrocentro San Salvador'),
+    ('PROV-005', 'NESET S.A. de C.V.', '2222-9900', 'info@gmail.com',          'San Salvador, El Salvador');
+GO
+
+
+-- PRODUCTOS  (depende de categoria)
+-----------------------------------------------------
+INSERT INTO productos (codprod, codCategoria, descripcion, precioCompra, precioVenta, stock, stockMinimo)
+VALUES 
+    ('PROD-001', 1, 'Laptop HP 15.6" Core i5 12va Gen 8GB RAM 512GB SSD',   450.00,  699.99, 20, 5),
+    ('PROD-002', 1, 'Laptop Lenovo IdeaPad 3 Ryzen 5 16GB RAM 1TB SSD',     520.00,  799.99, 15, 5),
+    ('PROD-003', 2, 'Teclado Mecánico Logitech G413 TKL SE USB',              45.00,   75.00, 40, 8),
+    ('PROD-004', 3, 'Monitor LG 24" Full HD IPS 75Hz HDMI/VGA',             150.00,  249.99, 18, 5),
+    ('PROD-005', 4, 'SSD Kingston A400 1TB SATA 2.5"',                        60.00,   99.99, 35, 10);
+GO
+
+
+-- VENTAS
+-----------------------------------------------------
+INSERT INTO ventas (norden, ordenN, codclien, codvend, subtotal, iva, total, tipoPago, meses, tasaInteres, saldo)
+VALUES 
+    ('VEN-0001', 1, 'CLI-001', 4,  699.99,  90.99,  790.98, 'CONTADO', NULL, 0.00,   0.00),
+    ('VEN-0002', 2, 'CLI-002', 4, 1499.98, 194.99, 1694.97, 'CREDITO',    6, 2.50, 1694.97),
+    ('VEN-0003', 3, 'CLI-003', 2,  249.99,  32.49,  282.48, 'CONTADO', NULL, 0.00,   0.00),
+    ('VEN-0004', 4, 'CLI-004', 4,  875.00, 113.75,  988.75, 'CREDITO',    3, 1.50,  988.75),
+    ('VEN-0005', 5, 'CLI-005', 2,  199.98,  25.99,  225.97, 'CONTADO', NULL, 0.00,   0.00);
+GO
+
+
+-- 7. VENTAS DETALLE  (dispara TR_DisminuirStock)
+-----------------------------------------------------
+INSERT INTO ventasDetalle (norden, codprod, cantidad, pventa, subtotal)
+VALUES 
+    ('VEN-0001', 'PROD-001', 1,  699.99,  699.99),
+    ('VEN-0002', 'PROD-002', 1,  799.99,  799.99),
+    ('VEN-0002', 'PROD-003', 1,   75.00,   75.00),
+    ('VEN-0003', 'PROD-004', 1,  249.99,  249.99),
+    ('VEN-0004', 'PROD-001', 1,  699.99,  699.99),
+    ('VEN-0005', 'PROD-003', 1,   75.00,   75.00),
+    ('VEN-0005', 'PROD-005', 1,   99.99,   99.99);
+GO
+
+
+--COMPRAS (depende de proveedores y users)
+-----------------------------------------------------
+INSERT INTO compras (norden, ordenN, codprov, codusu, subtotal, iva, total)
+VALUES 
+    ('COM-0001', 1, 'PROV-001', 3,  4500.00,  585.00,  5085.00),
+    ('COM-0002', 2, 'PROV-002', 3,  2250.00,  292.50,  2542.50),
+    ('COM-0003', 3, 'PROV-003', 1,   900.00,  117.00,  1017.00),
+    ('COM-0004', 4, 'PROV-001', 3,  3120.00,  405.60,  3525.60),
+    ('COM-0005', 5, 'PROV-004', 3,  1800.00,  234.00,  2034.00);
+GO
+
+
+--  COMPRAS DETALLE
+-----------------------------------------------------
+INSERT INTO comprasDetalle (norden, codprod, cantidad, precio, subtotal)
+VALUES 
+    ('COM-0001', 'PROD-001', 10,  450.00, 4500.00),
+    ('COM-0002', 'PROD-002',  5,  520.00, 2600.00),
+    ('COM-0003', 'PROD-003', 20,   45.00,  900.00),
+    ('COM-0004', 'PROD-004', 10,  150.00, 1500.00),
+    ('COM-0004', 'PROD-001',  4,  450.00, 1800.00),
+    ('COM-0005', 'PROD-005', 30,   60.00, 1800.00);
+GO
+
+-----------------------------------------------------
+-- PLAN DE PAGOS (solo ventas en CREDITO: VEN-0002 y VEN-0004)
+-- VEN-0002: 6 cuotas de ~282.49
+-- VEN-0004: 3 cuotas de ~329.58
+-----------------------------------------------------
+INSERT INTO planPagos (norden, numeroCuota, fechaVencimiento, montoCuota)
+VALUES
+    -- VEN-0002 (6 cuotas)
+    ('VEN-0002', 1, '2026-04-12', 282.49),
+    ('VEN-0002', 2, '2026-05-12', 282.49),
+    ('VEN-0002', 3, '2026-06-12', 282.49),
+    ('VEN-0002', 4, '2026-07-12', 282.50),
+    ('VEN-0002', 5, '2026-08-12', 282.50),
+    ('VEN-0002', 6, '2026-09-12', 282.49),
+    -- VEN-0004 (3 cuotas)
+    ('VEN-0004', 1, '2026-04-17', 329.58),
+    ('VEN-0004', 2, '2026-05-17', 329.58),
+    ('VEN-0004', 3, '2026-06-17', 329.59);
+GO
+
+
+-- ABONOS (1 abono por venta crédito para probar TR_ActualizarSaldo)
+-----------------------------------------------------
+INSERT INTO abonosVentas (norden, monto, numeroCuota)
+VALUES 
+    ('VEN-0002', 282.49, 1),
+    ('VEN-0002', 282.49, 2),
+    ('VEN-0004', 329.58, 1),
+    ('VEN-0002', 282.49, 3),
+    ('VEN-0004', 329.58, 2);
+GO
+
+

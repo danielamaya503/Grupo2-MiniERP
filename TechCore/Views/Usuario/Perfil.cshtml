@@ -1,0 +1,256 @@
+﻿@model TechCore.Models.DTO.Usuario.UsuarioPerfilDTO;
+
+
+@{
+    ViewData["Title"]  = "Mi Perfil";
+    ViewData["Active"] = "Perfil";
+
+    var pwdDto = ViewBag.CambiarPasswordDTO as TechCore.Models.DTO.Usuario.UsuarioCambiarPasswordDTO;
+}
+
+<div class="max-w-5xl mx-auto w-full space-y-8">
+
+    <div class="space-y-1">
+        <h2 class="text-3xl font-black text-slate-900 dark:text-slate-100">Mi Perfil</h2>
+        <p class="text-slate-500">Actualiza tu información personal y contraseña de acceso.</p>
+    </div>
+
+    @* ── Alerta de éxito ──────────────────────────────── *@
+    @if (TempData["Exito"] != null)
+    {
+        <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center gap-3">
+            <span class="material-symbols-outlined text-emerald-600">check_circle</span>
+            <p class="text-sm font-bold text-emerald-700">@TempData["Exito"]</p>
+        </div>
+    }
+
+    @* ── Alerta de error ──────────────────────────────── *@
+    @if (TempData["Error"] != null)
+    {
+        <div class="p-4 rounded-xl bg-red-50 border border-red-200 flex items-center gap-3">
+            <span class="material-symbols-outlined text-red-600">cancel</span>
+            <p class="text-sm font-bold text-red-700">@TempData["Error"]</p>
+        </div>
+    }
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        @* ══════════════════════════════════════════════════ *@
+        @* COLUMNA IZQUIERDA                                 *@
+        @* ══════════════════════════════════════════════════ *@
+        <div class="lg:col-span-2 space-y-8">
+
+            @* ── FORM 1 — Datos personales ────────────────── *@
+            <form asp-action="ActualizarPerfil" asp-controller="Usuario" method="post">
+                @Html.AntiForgeryToken()
+                <input asp-for="Id" type="hidden" />
+
+                <section class="bg-white dark:bg-background-dark rounded-xl border border-border-soft overflow-hidden shadow-sm">
+                    <div class="p-6 border-b border-border-soft">
+                        <h3 class="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">person</span>
+                            Datos Personales
+                        </h3>
+                    </div>
+                    <div class="p-6">
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                            @* Username — solo lectura *@
+                            <div class="space-y-2">
+                                <label class="text-xs font-bold text-slate-500 uppercase">
+                                    Nombre de Usuario
+                                </label>
+                                <input asp-for="Username" type="text" readonly
+                                       class="w-full px-4 py-2 bg-slate-100 border-none rounded-lg text-sm text-slate-400 cursor-not-allowed" />
+                                <p class="text-[10px] text-slate-400">El nombre de usuario no se puede modificar</p>
+                            </div>
+
+                            @* Nombre completo *@
+                            <div class="space-y-2">
+                                <label asp-for="Nombre" class="text-xs font-bold text-slate-500 uppercase"></label>
+                                <input asp-for="Nombre" type="text"
+                                       class="w-full px-4 py-2 bg-neutral-soft border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/50 text-slate-700 font-medium" />
+                                <span asp-validation-for="Nombre" class="text-[11px] text-red-500"></span>
+                            </div>
+
+                            @* Email *@
+                            <div class="space-y-2">
+                                <label asp-for="Email" class="text-xs font-bold text-slate-500 uppercase"></label>
+                                <input asp-for="Email" type="email"
+                                       class="w-full px-4 py-2 bg-neutral-soft border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/50 text-slate-700 font-medium" />
+                                <span asp-validation-for="Email" class="text-[11px] text-red-500"></span>
+                            </div>
+
+                            @* Teléfono *@
+                            <div class="space-y-2">
+                                <label asp-for="Phone" class="text-xs font-bold text-slate-500 uppercase"></label>
+                                <input asp-for="Phone" type="text"
+                                       class="w-full px-4 py-2 bg-neutral-soft border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/50 text-slate-700 font-medium" />
+                                <span asp-validation-for="Phone" class="text-[11px] text-red-500"></span>
+                            </div>
+
+                        </div>
+
+                        <div class="mt-8 flex justify-end">
+                            <button type="submit"
+                                    class="px-6 py-2 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition-colors shadow-sm shadow-primary/20">
+                                Guardar Cambios
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </form>
+
+            @* ── FORM 2 — Cambiar contraseña ──────────────── *@
+            <form asp-action="CambiarPassword" asp-controller="Usuario" method="post">
+                @Html.AntiForgeryToken()
+
+                @* Id del usuario autenticado — viene del ViewBag *@
+                <input type="hidden" name="Id" value="@pwdDto!.Id" />
+
+                <section class="bg-white dark:bg-background-dark rounded-xl border border-border-soft overflow-hidden shadow-sm">
+                    <div class="p-6 border-b border-border-soft flex items-center justify-between">
+                        <h3 class="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">lock</span>
+                            Cambiar Contraseña
+                        </h3>
+                        <span class="text-xs text-slate-400">Déjalo vacío si no deseas cambiarla</span>
+                    </div>
+                    <div class="p-6">
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                            @* Contraseña actual *@
+                            <div class="space-y-2">
+                                <label class="text-xs font-bold text-slate-500 uppercase">Contraseña Actual</label>
+                                <div class="relative">
+                                    <input name="PasswordActual" type="password" id="pwdActual"
+                                           class="w-full px-4 pr-10 py-2 bg-neutral-soft border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/50"
+                                           placeholder="••••••••" />
+                                    <button type="button" onclick="togglePwd('pwdActual','eyeActual')"
+                                            class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                                        <span class="material-symbols-outlined text-[18px]" id="eyeActual">visibility</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            @* Nueva contraseña *@
+                            <div class="space-y-2">
+                                <label class="text-xs font-bold text-slate-500 uppercase">Nueva Contraseña</label>
+                                <div class="relative">
+                                    <input name="NuevaPassword" type="password" id="pwdNueva"
+                                           class="w-full px-4 pr-10 py-2 bg-neutral-soft border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/50"
+                                           placeholder="••••••••" />
+                                    <button type="button" onclick="togglePwd('pwdNueva','eyeNueva')"
+                                            class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                                        <span class="material-symbols-outlined text-[18px]" id="eyeNueva">visibility</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            @* Confirmar contraseña *@
+                            <div class="space-y-2">
+                                <label class="text-xs font-bold text-slate-500 uppercase">Confirmar Contraseña</label>
+                                <div class="relative">
+                                    <input name="ConfirmarPassword" type="password" id="pwdConfirmar"
+                                           class="w-full px-4 pr-10 py-2 bg-neutral-soft border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/50"
+                                           placeholder="••••••••" />
+                                    <button type="button" onclick="togglePwd('pwdConfirmar','eyeConfirmar')"
+                                            class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                                        <span class="material-symbols-outlined text-[18px]" id="eyeConfirmar">visibility</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="mt-6 flex justify-end">
+                            <button type="submit"
+                                    class="px-6 py-2 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition-colors shadow-sm shadow-primary/20">
+                                Actualizar Contraseña
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </form>
+
+        </div>
+
+        @* ══════════════════════════════════════════════════ *@
+        @* COLUMNA DERECHA — info de la cuenta              *@
+        @* ══════════════════════════════════════════════════ *@
+        <div class="space-y-8">
+            <section class="bg-white dark:bg-background-dark rounded-xl border border-border-soft overflow-hidden shadow-sm">
+                <div class="p-6 border-b border-border-soft">
+                    <h3 class="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">badge</span>
+                        Mi Cuenta
+                    </h3>
+                </div>
+                <div class="p-6 space-y-4">
+
+                    @* Avatar con inicial *@
+                    <div class="flex flex-col items-center gap-3 pb-4 border-b border-border-soft">
+                        <div class="size-16 rounded-full bg-primary/20 flex items-center justify-center">
+                            <span class="text-primary text-2xl font-black">
+                                @Model.Nombre.Substring(0, 1).ToUpper()
+                            </span>
+                        </div>
+                        <div class="text-center">
+                            <p class="font-bold text-slate-800 dark:text-slate-100">@Model.Nombre</p>
+                            <p class="text-xs text-slate-400">@@@Model.Username</p>
+                        </div>
+                    </div>
+
+                    @* Datos de solo lectura *@
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-slate-500">Usuario</span>
+                            <span class="text-xs font-bold text-slate-700 font-mono">@Model.Username</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-slate-500">Correo</span>
+                            <span class="text-xs font-bold text-slate-700 truncate ml-2">
+                                @(Model.Email ?? "—")
+                            </span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-slate-500">Teléfono</span>
+                            <span class="text-xs font-bold text-slate-700">
+                                @(Model.Phone ?? "—")
+                            </span>
+                        </div>
+                    </div>
+
+                    @* Consejo de seguridad *@
+                    <div class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                        <p class="text-[11px] text-amber-700 font-medium flex items-start gap-2">
+                            <span class="material-symbols-outlined text-sm mt-0.5">info</span>
+                            Si tu contraseña fue restablecida por un administrador, cámbiala lo antes posible.
+                        </p>
+                    </div>
+
+                </div>
+            </section>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function togglePwd(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon  = document.getElementById(iconId);
+            if (input.type === 'password') {
+                input.type       = 'text';
+                icon.textContent = 'visibility_off';
+            } else {
+                input.type       = 'password';
+                icon.textContent = 'visibility';
+            }
+        }
+    </script>
+}

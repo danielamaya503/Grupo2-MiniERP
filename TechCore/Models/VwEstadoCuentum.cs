@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 
 namespace TechCore.Models;
 
+[Keyless]
 public partial class VwEstadoCuentum
 {
     public string Norden { get; set; } = string.Empty;
