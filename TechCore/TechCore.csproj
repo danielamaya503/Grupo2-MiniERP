@@ -28,9 +28,5 @@
 		<UpToDateCheckBuilt Include="tailwind.config.js" Set="Css" />
 	</ItemGroup>
 
-	<Target Name="NpmInstall" BeforeTargets="Tailwind"
-        Condition="!Exists('node_modules')">
-		<Exec Command="npm install" />
-	</Target>
 
 </Project>
