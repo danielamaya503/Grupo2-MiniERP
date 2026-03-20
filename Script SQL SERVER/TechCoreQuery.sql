@@ -48,7 +48,7 @@ GO
 INSERT INTO users (code, nombre, username, pwd, phone, idrol, email)
 VALUES 
 (
-    'USR-002',
+    'USR-001',
     'Administrador TechCore',
     'admin',
     '$2a$11$S14bynqUvQmnTymkQHe9eOzbDJTWhYetiDbrScRYVPz8OSwSoIWvG',
