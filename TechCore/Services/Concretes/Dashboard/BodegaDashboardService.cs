@@ -51,7 +51,7 @@ namespace TechCore.Services.Concretes.Dashboard
                         NOrden = c.Norden,
                         OrdenN = c.OrdenN,
                         Proveedor = c.CodprovNavigation.Nombre,
-                        Fecha = c.Fecha ?? DateTime.Now,
+                        Fecha = c.Fecha ?? DateTime.UtcNow,
                         Total = c.Total,
                         Estado = c.Estado ?? 1
                     })

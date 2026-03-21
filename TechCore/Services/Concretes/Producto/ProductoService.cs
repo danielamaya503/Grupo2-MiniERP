@@ -47,7 +47,7 @@ namespace TechCore.Services.Concretes.Producto
                         Stock = p.Stock ?? 0,
                         StockMinimo = p.StockMinimo ?? 5,
                         Estado = p.Estado,
-                        CreatedDate = p.CreatedDate ?? DateTime.Now
+                        CreatedDate = p.CreatedDate ?? DateTime.UtcNow
                     })
                     .ToListAsync();
             }
@@ -83,7 +83,7 @@ namespace TechCore.Services.Concretes.Producto
                         Stock = p.Stock ?? 0,
                         StockMinimo = p.StockMinimo ?? 5,
                         Estado = p.Estado,
-                        CreatedDate = p.CreatedDate ?? DateTime.Now
+                        CreatedDate = p.CreatedDate ?? DateTime.UtcNow
                     })
                     .ToListAsync();
             }
@@ -114,7 +114,7 @@ namespace TechCore.Services.Concretes.Producto
                     Stock = dto.Stock,
                     StockMinimo = dto.StockMinimo,
                     Estado = true,
-                    CreatedDate = DateTime.Now
+                    CreatedDate = DateTime.UtcNow
                 };
 
                 context.Productos.Add(nuevoProducto);
@@ -235,7 +235,7 @@ namespace TechCore.Services.Concretes.Producto
                         Stock = p.Stock ?? 0,
                         StockMinimo = p.StockMinimo ?? 5,
                         Estado = p.Estado,
-                        CreatedDate = p.CreatedDate ?? DateTime.Now
+                        CreatedDate = p.CreatedDate ?? DateTime.UtcNow
                     })
                     .ToListAsync();
             }
@@ -267,7 +267,7 @@ namespace TechCore.Services.Concretes.Producto
                         Stock = p.Stock ?? 0,
                         StockMinimo = p.StockMinimo ?? 5,
                         Estado = p.Estado,
-                        CreatedDate = p.CreatedDate ?? DateTime.Now
+                        CreatedDate = p.CreatedDate ?? DateTime.UtcNow
                     })
                     .ToListAsync();
             }

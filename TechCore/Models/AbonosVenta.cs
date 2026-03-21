@@ -17,7 +17,7 @@ public partial class AbonosVenta
     [MaxLength(50)]
     public string Norden { get; set; } = string.Empty;
 
-    public DateTime? Fecha { get; set; } = DateTime.Now;
+    public DateTime? Fecha { get; set; } = DateTime.UtcNow;
     [Precision(18,2)]
     public decimal Monto { get; set; }
     public int NumeroCuota { get; set; }

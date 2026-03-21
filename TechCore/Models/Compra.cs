@@ -17,7 +17,7 @@ public partial class Compra
     public string Codprov { get; set; } = string.Empty!;
     public int Codusu { get; set; }
 
-    public DateTime? Fecha { get; set; } = DateTime.Now;
+    public DateTime? Fecha { get; set; } = DateTime.UtcNow;
 
     public decimal Subtotal { get; set; }
     [Precision(18,2)]

@@ -24,7 +24,7 @@ public partial class Proveedore
 
     public int Estado { get; set; } = 1;
 
-    public DateTime? CreatedDate { get; set; } = DateTime.Now;
+    public DateTime? CreatedDate { get; set; } = DateTime.UtcNow;
 
     public virtual List<Compra> Compras { get; set; } = [];
 }

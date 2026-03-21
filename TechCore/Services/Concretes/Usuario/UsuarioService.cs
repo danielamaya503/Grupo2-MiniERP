@@ -96,7 +96,7 @@ namespace TechCore.Services.Concretes.Usuario
                         Username = u.Username,
                         Email = u.Email,
                         NombreRol = u.IdrolNavigation.NombreRol,
-                        CreatedDate = u.CreatedDate ?? DateTime.Now
+                        CreatedDate = u.CreatedDate ?? DateTime.UtcNow
                     })
                     .ToListAsync();
             }
@@ -184,7 +184,7 @@ namespace TechCore.Services.Concretes.Usuario
                     Phone = dto.Phone,
                     Idrol = dto.IdRol,
                     Email = dto.Email,
-                    CreatedDate = DateTime.Now
+                    CreatedDate = DateTime.UtcNow
                 });
 
                 await context.SaveChangesAsync();

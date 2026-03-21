@@ -19,7 +19,7 @@ public partial class Venta
 
     public int Codvend { get; set; }
 
-    public DateTime? Fecha { get; set; } = DateTime.Now;
+    public DateTime? Fecha { get; set; } = DateTime.UtcNow;
     [Precision(18,2)]
     public decimal Subtotal { get; set; }
     [Precision(18, 2)]

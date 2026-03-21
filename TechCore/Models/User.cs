@@ -30,7 +30,7 @@ public partial class User
     [MaxLength(200)]
     public string? Email { get; set; }
 
-    public DateTime? CreatedDate { get; set; } = DateTime.Now;
+    public DateTime? CreatedDate { get; set; } = DateTime.UtcNow;
 
     public List<Compra> Compras { get; set; } = [];
 

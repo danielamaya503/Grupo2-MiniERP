@@ -20,7 +20,7 @@ public partial class Categorium
 
     public bool Estado { get; set; } = true;
 
-    public DateTime? CreatedDate { get; set; } = DateTime.Now;
+    public DateTime? CreatedDate { get; set; } = DateTime.UtcNow;
 
     public  List<Producto> Productos { get; set; } = [];
 }

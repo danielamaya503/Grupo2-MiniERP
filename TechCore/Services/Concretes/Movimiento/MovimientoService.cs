@@ -66,7 +66,7 @@ namespace TechCore.Services.Concretes.Movimiento
                     Cantidad = d.Cantidad,
                     Precio = d.Precio,
                     Subtotal = d.Subtotal,
-                    Fecha = d.NordenNavigation.Fecha ?? DateTime.Now,
+                    Fecha = d.NordenNavigation.Fecha ?? DateTime.UtcNow,
                     Origen = d.NordenNavigation.CodprovNavigation.Nombre
                 }).ToListAsync();
             }
@@ -106,7 +106,7 @@ namespace TechCore.Services.Concretes.Movimiento
                     Cantidad = d.Cantidad,
                     Precio = d.Pventa,
                     Subtotal = d.Subtotal,
-                    Fecha = d.NordenNavigation.Fecha ?? DateTime.Now,
+                    Fecha = d.NordenNavigation.Fecha ?? DateTime.UtcNow,
                     Origen = d.NordenNavigation.CodclienNavigation.Nombre
                 }).ToListAsync();
             }
