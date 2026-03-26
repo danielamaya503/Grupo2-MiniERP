@@ -29,18 +29,24 @@
         }
         };
     </script>
-    <link rel="icon" type="image/png" href="~/img/perfil-del-usuario.png" />
+    <link rel="icon" type="image/png" href="@Url.Content("~/img/perfil-del-usuario.png?v=2")" />
     <title>TechCore - Iniciar Sesión</title>
 </head>
 <body class="bg-background-light dark:bg-background-dark font-display min-h-screen flex flex-col items-center justify-center p-4">
     <div class="w-full max-w-[440px] flex flex-col gap-6">
 
         <!-- Logo Section -->
-        <div class="flex flex-col items-center gap-2 mb-2">
-            <div class="bg-primary/20 p-3 rounded-xl">
-                <span class="material-symbols-outlined text-primary text-4xl">monitoring</span>
+        <div class="flex flex-col items-center gap-3 mb-6">
+            <div class="w-24 h-24 rounded-2xl bg-white/10 border border-white/10 shadow-lg
+                flex items-center justify-center overflow-hidden p-2 backdrop-blur-sm">
+                <img src="~/img/techcore/logo-techcore.webp"
+                     alt="Logo TechCore"
+                     class="w-full h-full object-contain" />
             </div>
-            <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">TechCore</h1>
+
+            <h1 class="text-3xl font-extrabold text-slate-100 tracking-tight">
+                TechCore
+            </h1>
         </div>
 
         <!-- Main Login Card -->

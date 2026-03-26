@@ -22,7 +22,6 @@ builder.Services.AddDbContext<TechCoreContext>(options => {
 
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
 
-
     if (connectionString.Contains("neon.tech") || connectionString.Contains("Host="))
     {
         options.UseNpgsql(connectionString);

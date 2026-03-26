@@ -32,7 +32,8 @@
         }
     </script>
     @* ✅ Favicon *@
-    <link rel="icon" type="image/png" href="~/img/favicon.png" />
+    <link rel="icon" type="image/png" href="@Url.Content("~/img/favicon.png?v=2")" />
+    <link rel="shortcut icon" href="@Url.Content("~/img/favicon.png?v=2")" />
 
     <title>@ViewData["Title"] — TechCore</title>
 </head>
@@ -68,10 +69,18 @@
                 <!-- Logo + botón cerrar (solo móvil) -->
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3 text-primary">
-                        <div class="size-8 bg-primary/20 flex items-center justify-center rounded-lg">
-                            <span class="material-symbols-outlined text-primary">analytics</span>
+                        <div class="flex items-center gap-3">
+                            <div class="w-11 h-11 bg-primary/15 border border-primary/10 rounded-xl
+                                flex items-center justify-center overflow-hidden p-1 shadow-sm">
+                                <img src="@Url.Content("~/img/techcore/logo-techcore.webp")"
+                                     alt="Logo TechCore"
+                                     class="w-full h-full object-contain" />
+                            </div>
+
+                            <h2 class="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 leading-none">
+                                TechCore
+                            </h2>
                         </div>
-                        <h2 class="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">TechCore</h2>
                     </div>
                     <!-- Botón X solo visible en móvil -->
                     <button onclick="closeSidebar()"
