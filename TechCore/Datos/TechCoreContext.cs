@@ -148,6 +148,13 @@ public partial class TechCoreContext : DbContext
                 .HasMaxLength(15)
                 .IsUnicode(false)
                 .HasColumnName("telefono");
+
+            entity.HasOne(c => c.CreadorNavigation)   
+               .WithMany(u => u.ClientesCreados)           
+               .HasForeignKey(c => c.idCreador)     
+               .OnDelete(DeleteBehavior.ClientSetNull)
+               .HasConstraintName("FK_clientes_users");
+
         });
 
         modelBuilder.Entity<Compra>(entity =>

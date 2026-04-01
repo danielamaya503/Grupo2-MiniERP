@@ -60,11 +60,11 @@
             w-64 flex-shrink-0
             border-r border-border-soft
             bg-white dark:bg-background-dark
-            flex flex-col justify-between
+            flex flex-col overflow-hidden
             transform -translate-x-full lg:translate-x-0
             transition-transform duration-300 ease-in-out">
 
-            <div class="p-6 flex flex-col gap-8">
+            <div class="p-6 flex flex-col gap-2 flex-1 overflow-y-auto">
 
                 <!-- Logo + botón cerrar (solo móvil) -->
                 <div class="flex items-center justify-between">
@@ -90,7 +90,7 @@
                 </div>
 
                 <!-- Navegación -->
-                <nav class="p-6 flex flex-col gap-8 overflow-y-auto flex-1" ">
+                <nav class="flex flex-col gap-1">
 
                     @* ── Dashboard — todos los roles ─────────────────── *@
                     <a asp-controller="Home" asp-action="Index"
@@ -107,14 +107,14 @@
                     {
                         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 pt-4 pb-1">Administración</p>
 
-                        <a asp-controller="Clientes" asp-action="Index"
+                        <a asp-controller="Cliente" asp-action="Index"
                                class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-neutral-soft dark:text-slate-400 transition-colors
                             @(ViewData["Active"]?.ToString() == "Clientes" ? "bg-primary/10 text-primary font-semibold" : "")">
                             <span class="material-symbols-outlined">group</span>
                             <span class="text-sm">Clientes</span>
                         </a>
 
-                        <a asp-controller="Proveedores" asp-action="Index"
+                        <a asp-controller="Proveedor" asp-action="Index"
                                class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-neutral-soft dark:text-slate-400 transition-colors
                             @(ViewData["Active"]?.ToString() == "Proveedores" ? "bg-primary/10 text-primary font-semibold" : "")">
                             <span class="material-symbols-outlined">local_shipping</span>
@@ -157,7 +157,7 @@
                             <span class="text-sm">Inventario</span>
                         </a>
 
-                        <a asp-controller="Clientes" asp-action="Index"
+                        <a asp-controller="Cliente" asp-action="Index"
                                class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-neutral-soft dark:text-slate-400 transition-colors
                             @(ViewData["Active"]?.ToString() == "Clientes" ? "bg-primary/10 text-primary font-semibold" : "")">
                             <span class="material-symbols-outlined">group</span>
@@ -179,6 +179,13 @@
                             <span class="text-sm">Producto</span>
                         </a>
 
+                        <a asp-controller="Proveedor" asp-action="Index"
+                               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-neutral-soft dark:text-slate-400 transition-colors
+                            @(ViewData["Active"]?.ToString() == "Proveedores" ? "bg-primary/10 text-primary font-semibold" : "")">
+                            <span class="material-symbols-outlined">local_shipping</span>
+                            <span class="text-sm">Proveedores</span>
+                        </a>
+
                         <a asp-controller="Compras" asp-action="Index"
                                class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-neutral-soft dark:text-slate-400 transition-colors
                             @(ViewData["Active"]?.ToString() == "Compras" ? "bg-primary/10 text-primary font-semibold" : "")">
@@ -186,7 +193,7 @@
                             <span class="text-sm">Compras</span>
                         </a>
 
-                        <a asp-controller="Movimientos" asp-action="Index"
+                        <a asp-controller="Movimiento" asp-action="Index"
                                class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-neutral-soft dark:text-slate-400 transition-colors
                             @(ViewData["Active"]?.ToString() == "Movimientos" ? "bg-primary/10 text-primary font-semibold" : "")">
                             <span class="material-symbols-outlined">swap_vert</span>

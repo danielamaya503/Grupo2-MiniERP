@@ -37,4 +37,6 @@ public partial class User
     public virtual Rol IdrolNavigation { get; set; } = null!;
 
     public List<Venta> Venta { get; set; } = [];
+
+    public List<Cliente> ClientesCreados { get; set; } = [];
 }

@@ -1,0 +1,518 @@
+﻿@model TechCore.Models.DTO.Movimiento.MovimientoPaginadoDTO
+@{
+    ViewData["Title"] = "Movimientos";
+    ViewData["Active"] = "Movimientos";
+
+    var anios = ViewBag.AniosDisponibles as List<int> ?? new List<int> { DateTime.Now.Year };
+
+    // Nombre del mes activo
+    var nombreMesActivo = new DateTime(Model.Anio, Model.Mes, 1)
+        .ToString("MMMM yyyy", new System.Globalization.CultureInfo("es-ES"));
+    nombreMesActivo = char.ToUpper(nombreMesActivo[0]) + nombreMesActivo[1..];
+
+    // Helper: iniciales del usuario para el avatar
+    string Iniciales(string nombre)
+    {
+        if (string.IsNullOrWhiteSpace(nombre)) return "??";
+        var partes = nombre.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return partes.Length >= 2
+            ? $"{partes[0][0]}{partes[1][0]}".ToUpper()
+            : nombre[..Math.Min(2, nombre.Length)].ToUpper();
+    }
+}
+
+<div class="space-y-6">
+
+    @* ── Encabezado ─────────────────────────────────────────── *@
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+            <h1 class="text-3xl font-black tracking-tight text-slate-900 dark:text-white">
+                Movimientos de Inventario
+            </h1>
+            <p class="text-slate-500 dark:text-slate-400 mt-1">
+                Historial detallado para trazabilidad y auditoría de stock.
+            </p>
+        </div>
+        <div class="flex gap-3">
+            @* ── Botón Exportar PDF ── *@
+            <a asp-action="ExportarPDF"
+                   asp-route-mes="@Model.Mes"
+                   asp-route-anio="@Model.Anio"
+                   asp-route-tipo="@Model.FiltroTipo"
+                   target="_blank"
+                   class="inline-flex items-center gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 px-4 py-2.5 rounded-lg font-semibold transition-all hover:bg-red-50 hover:text-red-600 hover:border-red-200">
+                <span class="material-symbols-outlined">picture_as_pdf</span>
+                Exportar PDF
+            </a>
+        </div>
+    </div>
+
+    @* ── Alertas TempData ──────────────────────────────────── *@
+    @if (TempData["Exito"] != null)
+    {
+        <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center gap-3">
+            <span class="material-symbols-outlined text-emerald-600">check_circle</span>
+            <p class="text-sm font-bold text-emerald-700">@TempData["Exito"]</p>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="p-4 rounded-xl bg-red-50 border border-red-200 flex items-center gap-3">
+            <span class="material-symbols-outlined text-red-600">cancel</span>
+            <p class="text-sm font-bold text-red-700">@TempData["Error"]</p>
+        </div>
+    }
+
+    @* ══════════════════════════════════════════════════════
+       LAYOUT: SIDEBAR FILTROS + TABLA
+    ══════════════════════════════════════════════════════ *@
+    <div class="flex flex-col lg:flex-row gap-8">
+
+        @* ════════════════════════════════════════════════
+           SIDEBAR DE FILTROS
+        ════════════════════════════════════════════════ *@
+        <aside class="w-full lg:w-72 flex-shrink-0">
+            <form method="get" asp-action="Index" id="filtrosForm">
+                <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 space-y-6 sticky top-28">
+
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-bold text-slate-800 dark:text-white">Filtros</h3>
+                        <a asp-action="Index"
+                               class="text-xs text-primary font-bold uppercase tracking-wider hover:underline">
+                            Limpiar
+                        </a>
+                    </div>
+
+                    @* ── Selector Año ─────────────────────── *@
+                    <div class="space-y-3">
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest">
+                            Año
+                        </label>
+                        <select name="anio" onchange="this.form.submit()"
+                                class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:border-primary focus:ring-primary">
+                            @foreach (var anio in anios)
+                            {
+                                if (anio == Model.Anio)
+                                {
+                                    <option value="@anio" selected>@anio</option>
+                                }
+                                else
+                                {
+                                    <option value="@anio">@anio</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    @* ── Selector Mes ─────────────────────── *@
+                    <div class="space-y-3">
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest">
+                            Mes
+                        </label>
+                        <select name="mes" onchange="this.form.submit()"
+                                class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:border-primary focus:ring-primary">
+                            @{
+                                var meses = new[] {
+                                    (1,"Enero"),(2,"Febrero"),(3,"Marzo"),(4,"Abril"),
+                                    (5,"Mayo"),(6,"Junio"),(7,"Julio"),(8,"Agosto"),
+                                    (9,"Septiembre"),(10,"Octubre"),(11,"Noviembre"),(12,"Diciembre")
+                                };
+                            }
+                            @foreach (var (num, nombre) in meses)
+                            {
+                                if (num == Model.Mes)
+                                {
+                                    <option value="@num" selected>@nombre</option>
+                                }
+                                else
+                                {
+                                    <option value="@num">@nombre</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    @* ── Tipo de Movimiento ───────────────── *@
+                    <div class="space-y-3">
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest">
+                            Tipo de Movimiento
+                        </label>
+                        <div class="space-y-2">
+                            @{
+                                var tipos = new[]
+                                {
+                                    ("", "Todos los movimientos", "sync_alt"),
+                                    ("Entrada", "Entradas de Stock", "arrow_downward"),
+                                    ("Salida", "Salidas de Stock", "arrow_upward")
+                                };
+                            }
+                            @foreach (var (val, lbl, icon) in tipos)
+                            {
+                                var esActivo = (Model.FiltroTipo ?? "") == val;
+                                <label class="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-300 cursor-pointer p-2 rounded-lg @(esActivo ? "bg-primary/10 text-primary font-semibold" : "hover:bg-slate-50 dark:hover:bg-slate-800")">
+                                    <input type="radio" name="tipo" value="@val"
+                                    @(esActivo ? "checked" : "")
+                                           onchange="this.form.submit()"
+                                           class="text-primary focus:ring-primary border-slate-300 dark:border-slate-700" />
+                                    <span class="material-symbols-outlined text-base">@icon</span>
+                                    @lbl
+                                </label>
+                            }
+                        </div>
+                    </div>
+
+                    @* ── Campo oculto para pagina ─────────── *@
+                    <input type="hidden" name="pagina" value="1" />
+
+                    @* ── Resumen del período ──────────────── *@
+                    <div class="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
+                            Resumen — @nombreMesActivo
+                        </p>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="flex items-center gap-1.5 text-slate-500">
+                                <span class="w-2 h-2 rounded-full bg-green-500 inline-block"></span>
+                                Entradas
+                            </span>
+                            <span class="font-bold text-green-600">@Model.TotalEntradas</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="flex items-center gap-1.5 text-slate-500">
+                                <span class="w-2 h-2 rounded-full bg-orange-500 inline-block"></span>
+                                Salidas
+                            </span>
+                            <span class="font-bold text-orange-600">@Model.TotalSalidas</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm pt-1 border-t border-slate-100 dark:border-slate-800">
+                            <span class="text-slate-500 font-medium">Total</span>
+                            <span class="font-black text-slate-900 dark:text-white">@Model.TotalRegistros</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-500">Monto entradas</span>
+                            <span class="font-bold text-green-600 text-xs">$@Model.MontoEntradas.ToString("N2")</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-500">Monto salidas</span>
+                            <span class="font-bold text-orange-600 text-xs">$@Model.MontoSalidas.ToString("N2")</span>
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+        </aside>
+
+        @* ════════════════════════════════════════════════
+           TABLA PRINCIPAL
+        ════════════════════════════════════════════════ *@
+        <div class="flex-1 overflow-hidden">
+            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+
+                @* ── Barra superior de la tabla ─────────── *@
+                <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        @if (Model.TotalRegistros == 0)
+                        {
+                            <span class="text-sm font-bold text-slate-500 dark:text-slate-400">
+                                Sin movimientos en @nombreMesActivo
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="text-sm font-bold text-slate-700 dark:text-slate-200">
+                                Mostrando
+                                <span class="text-primary">@Model.DesdeRegistro–@Model.HastaRegistro</span>
+                                de
+                                <span class="text-primary">@Model.TotalRegistros</span>
+                                movimientos
+                            </span>
+                        }
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-slate-400 font-medium">Período:</span>
+                        <span class="text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg">
+                            @nombreMesActivo
+                        </span>
+                        @if (!string.IsNullOrEmpty(Model.FiltroTipo))
+                        {
+                            <span class="text-xs font-bold px-2 py-1 rounded-lg @(Model.FiltroTipo == "Entrada" ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700")">
+                                Solo @Model.FiltroTipo@(Model.FiltroTipo == "Entrada" ? "s" : "s")
+                            </span>
+                        }
+                    </div>
+                </div>
+
+                @* ── Tabla ──────────────────────────────── *@
+                <div class="overflow-x-auto">
+                    @if (!Model.Movimientos.Any())
+                    {
+                        <div class="py-20 flex flex-col items-center gap-3 text-center">
+                            <span class="material-symbols-outlined text-6xl text-slate-200">
+                                inventory_2
+                            </span>
+                            <p class="text-lg font-bold text-slate-500">
+                                No hay movimientos en @nombreMesActivo
+                            </p>
+                            <p class="text-sm text-slate-400">
+                                Selecciona otro mes o año en los filtros
+                            </p>
+                        </div>
+                    }
+                    else
+                    {
+                        <table class="w-full text-left border-collapse table-dense">
+                            <thead>
+                                <tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+                                    <th class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-4 py-3">
+                                        ID / Fecha
+                                    </th>
+                                    <th class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-4 py-3">
+                                        Producto
+                                    </th>
+                                    <th class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-4 py-3 text-center">
+                                        Tipo
+                                    </th>
+                                    <th class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-4 py-3 text-right">
+                                        Cant.
+                                    </th>
+                                    <th class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-4 py-3 text-right">
+                                        Subtotal
+                                    </th>
+                                    <th class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-4 py-3">
+                                        Orden / Origen
+                                    </th>
+                                    <th class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-4 py-3">
+                                        Responsable
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                                @foreach (var mov in Model.Movimientos)
+                                {
+                                    var esEntrada = mov.Tipo == "Entrada";
+                                    var prefijo = esEntrada ? "OC-" : "VT-";
+                                    var iniciales = Iniciales(mov.UsuarioNombre ?? "");
+                                    var colorAvatar = esEntrada ? "bg-primary/20 text-primary" : "bg-blue-100 text-blue-600";
+
+                                    <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
+
+                                        @* ID / Fecha *@
+                                        <td class="whitespace-nowrap px-4 py-3">
+                                            <div class="text-sm font-bold text-slate-900 dark:text-white font-mono">
+                                                #@prefijo@mov.Referencia.ToString()
+                                            </div>
+                                            <div class="text-[11px] text-slate-400">
+                                                @mov.Fecha.ToString("dd MMM, yyyy", new System.Globalization.CultureInfo("es-ES")) •
+                                                @mov.Fecha.ToString("HH:mm")
+                                            </div>
+                                        </td>
+
+                                        @* Producto *@
+                                        <td class="px-4 py-3">
+                                            <div class="flex items-center gap-3">
+                                                <div class="h-8 w-8 rounded bg-slate-100 dark:bg-slate-800 flex items-center justify-center flex-shrink-0">
+                                                    <span class="material-symbols-outlined text-slate-400 text-lg">inventory_2</span>
+                                                </div>
+                                                <div>
+                                                    <p class="text-sm font-semibold text-slate-700 dark:text-slate-200 line-clamp-1">
+                                                        @mov.Descripcion
+                                                    </p>
+                                                    <p class="text-[10px] text-slate-400 font-medium font-mono">
+                                                        @mov.CodProd
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        @* Tipo badge *@
+                                        <td class="text-center px-4 py-3">
+                                            @if (esEntrada)
+                                            {
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 uppercase">
+                                                    <span class="material-symbols-outlined" style="font-size:12px">arrow_downward</span>
+                                                    Entrada
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 uppercase">
+                                                    <span class="material-symbols-outlined" style="font-size:12px">arrow_upward</span>
+                                                    Salida
+                                                </span>
+                                            }
+                                        </td>
+
+                                        @* Cantidad *@
+                                        <td class="text-right px-4 py-3">
+                                            <span class="text-sm font-bold @(esEntrada ? "text-green-600" : "text-orange-600")">
+                                                @(esEntrada ? "+" : "-")@mov.Cantidad.ToString("N0")
+                                            </span>
+                                        </td>
+
+                                        @* Subtotal *@
+                                        <td class="text-right px-4 py-3">
+                                            <span class="text-sm font-bold text-slate-700 dark:text-slate-200">
+                                                $@mov.Subtotal.ToString("N2")
+                                            </span>
+                                            <div class="text-[10px] text-slate-400">
+                                                $@mov.Precio.ToString("N2") c/u
+                                            </div>
+                                        </td>
+
+                                        @* Orden / Origen *@
+                                        <td class="px-4 py-3">
+                                            <div class="text-sm text-slate-600 dark:text-slate-300 font-medium font-mono">
+                                                #@prefijo@mov.Referencia.ToString()
+                                            </div>
+                                            <div class="text-[10px] text-slate-400 line-clamp-1">
+                                                @(esEntrada ? "Proveedor" : "Cliente"): @mov.Origen
+                                            </div>
+                                        </td>
+
+                                        @* Responsable *@
+                                        <td class="px-4 py-3">
+                                            <div class="flex items-center gap-2">
+                                                <div class="h-6 w-6 rounded-full @colorAvatar flex items-center justify-center text-[9px] font-bold flex-shrink-0">
+                                                    @iniciales
+                                                </div>
+                                                <span class="text-xs text-slate-500 line-clamp-1">
+                                                    @(mov.UsuarioNombre ?? "Sistema")
+                                                </span>
+                                            </div>
+                                        </td>
+
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+
+                @* ════════════════════════════════════════
+                   PAGINACIÓN
+                ════════════════════════════════════════ *@
+                @if (Model.TotalPaginas > 1)
+                {
+                    <div class="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+
+                        @* Controles de página *@
+                        <div class="flex gap-1.5 flex-wrap">
+
+                            @* Anterior *@
+                            @if (Model.TienePaginaAnterior)
+                            {
+                                <a asp-action="Index"
+                                       asp-route-mes="@Model.Mes"
+                                       asp-route-anio="@Model.Anio"
+                                       asp-route-tipo="@Model.FiltroTipo"
+                                       asp-route-pagina="@(Model.PaginaActual - 1)"
+                                       class="h-8 w-8 flex items-center justify-center rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 hover:border-primary transition-all">
+                                    <span class="material-symbols-outlined" style="font-size:16px">chevron_left</span>
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="h-8 w-8 flex items-center justify-center rounded border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-300 cursor-not-allowed">
+                                    <span class="material-symbols-outlined" style="font-size:16px">chevron_left</span>
+                                </span>
+                            }
+
+                            @* Números de página *@
+                            @{
+                                // Muestra máximo 5 páginas alrededor de la actual
+                                int pStart = Math.Max(1, Model.PaginaActual - 2);
+                                int pEnd = Math.Min(Model.TotalPaginas, pStart + 4);
+                                pStart = Math.Max(1, pEnd - 4);
+                            }
+
+                            @if (pStart > 1)
+                            {
+                                <a asp-action="Index"
+                                       asp-route-mes="@Model.Mes" asp-route-anio="@Model.Anio"
+                                       asp-route-tipo="@Model.FiltroTipo" asp-route-pagina="1"
+                                       class="h-8 w-8 flex items-center justify-center rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 text-xs font-medium">
+                                    1
+                                </a>
+                                @if (pStart > 2)
+                                {
+                                    <span class="text-slate-400 flex items-center px-1">…</span>
+                                }
+                            }
+
+                            @for (int p = pStart; p <= pEnd; p++)
+                            {
+                                if (p == Model.PaginaActual)
+                                {
+                                    <span class="h-8 w-8 flex items-center justify-center rounded border border-primary bg-primary/10 text-primary font-bold text-xs">
+                                        @p
+                                    </span>
+                                }
+                                else
+                                {
+                                    <a asp-action="Index"
+                                           asp-route-mes="@Model.Mes" asp-route-anio="@Model.Anio"
+                                           asp-route-tipo="@Model.FiltroTipo" asp-route-pagina="@p"
+                                           class="h-8 w-8 flex items-center justify-center rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 hover:border-primary text-xs font-medium transition-all">
+                                        @p
+                                    </a>
+                                }
+                            }
+
+                            @if (pEnd < Model.TotalPaginas)
+                            {
+                                @if (pEnd < Model.TotalPaginas - 1)
+                                {
+                                    <span class="text-slate-400 flex items-center px-1">…</span>
+                                }
+                                <a asp-action="Index"
+                                       asp-route-mes="@Model.Mes" asp-route-anio="@Model.Anio"
+                                       asp-route-tipo="@Model.FiltroTipo" asp-route-pagina="@Model.TotalPaginas"
+                                       class="h-8 w-8 flex items-center justify-center rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 text-xs font-medium">
+                                    @Model.TotalPaginas
+                                </a>
+                            }
+
+                            @* Siguiente *@
+                            @if (Model.TienePaginaSiguiente)
+                            {
+                                <a asp-action="Index"
+                                       asp-route-mes="@Model.Mes"
+                                       asp-route-anio="@Model.Anio"
+                                       asp-route-tipo="@Model.FiltroTipo"
+                                       asp-route-pagina="@(Model.PaginaActual + 1)"
+                                       class="h-8 w-8 flex items-center justify-center rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 hover:border-primary transition-all">
+                                    <span class="material-symbols-outlined" style="font-size:16px">chevron_right</span>
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="h-8 w-8 flex items-center justify-center rounded border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-300 cursor-not-allowed">
+                                    <span class="material-symbols-outlined" style="font-size:16px">chevron_right</span>
+                                </span>
+                            }
+                        </div>
+
+                        @* Info de registros *@
+                        <div class="text-xs text-slate-400 font-medium">
+                            Página <span class="font-bold text-slate-600 dark:text-slate-300">@Model.PaginaActual</span>
+                            de <span class="font-bold text-slate-600 dark:text-slate-300">@Model.TotalPaginas</span>
+                            —
+                            <span class="font-bold text-slate-600 dark:text-slate-300">@Model.TamanoPagina</span>
+                            por página
+                        </div>
+
+                    </div>
+                }
+                else if (Model.TotalRegistros > 0)
+                {
+                    <div class="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/30">
+                        <p class="text-xs text-slate-400 text-center">
+                            Mostrando los <span class="font-bold text-slate-600">@Model.TotalRegistros</span> registros del período
+                        </p>
+                    </div>
+                }
+
+            </div>
+        </div>
+
+    </div>
+</div>

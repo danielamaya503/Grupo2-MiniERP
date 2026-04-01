@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TechCore.Models.DTO.Proveedor
+namespace TechCore.Models.DTO.Cliente
 {
-    public class ProveedorFormDTO
+    public class ClienteFormDTO
     {
-        public string? Codprovee { get; set; }
+        public string? Codclien { get; set; }
+        public int IdCreador { get; set; }
 
         [Required(ErrorMessage = "El nombre es obligatorio.")]
         [MaxLength(200, ErrorMessage = "Máximo 200 caracteres.")]

@@ -26,5 +26,9 @@ public partial class Cliente
 
     public DateTime? CreatedDate { get; set; }
 
+    public int idCreador { get; set; }
+
+    public virtual User CreadorNavigation { get; set; } = null!;
+
     public List<Venta> Venta { get; set; } = [];
 }

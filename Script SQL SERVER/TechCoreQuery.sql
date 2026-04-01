@@ -96,7 +96,10 @@ CREATE TABLE clientes(
     email VARCHAR(200),
     direccion VARCHAR(300),
     estado BIT DEFAULT 1,
-    created_date DATETIME DEFAULT GETDATE()
+    created_date DATETIME DEFAULT GETDATE(),
+    idCreador int,
+    CONSTRAINT FK_clientes_users
+    FOREIGN KEY (idCreador) REFERENCES users(id)
 )
 GO
 
@@ -551,13 +554,13 @@ GO
 
 -- CLIENTES
 -----------------------------------------------------
-INSERT INTO clientes (codclien, nombre, telefono, email, direccion)
+INSERT INTO clientes (codclien, nombre, telefono, email, direccion, idCreador)
 VALUES 
-    ('CLI-001', 'Juan Carlos Martínez',   '7890-1234', 'jcmartinez@gmail.com',    'Col. Escalón, San Salvador'),
-    ('CLI-002', 'María López de García',  '7654-3210', 'mlopez@hotmail.com',      'Res. Santa Elena, Antiguo Cuscatlán'),
-    ('CLI-003', 'Distribuidora El Sol',   '2222-5555', 'elsol@distribuidora.com', 'Blvd. Los Héroes, San Salvador'),
-    ('CLI-004', 'Roberto Flores',         '7111-2233', 'rflores@outlook.com',     'Col. Médica, San Salvador'),
-    ('CLI-005', 'TechSolutions SV S.A.',  '2289-4400', 'info@techsolutions.sv',   'Zona Rosa, San Salvador');
+    ('CLI-001', 'Juan Carlos Martínez',   '7890-1234', 'jcmartinez@gmail.com',    'Col. Escalón, San Salvador', 4),
+    ('CLI-002', 'María López de García',  '7654-3210', 'mlopez@hotmail.com',      'Res. Santa Elena, Antiguo Cuscatlán', 4),
+    ('CLI-003', 'Distribuidora El Sol',   '2222-5555', 'elsol@distribuidora.com', 'Blvd. Los Héroes, San Salvador', 4),
+    ('CLI-004', 'Roberto Flores',         '7111-2233', 'rflores@outlook.com',     'Col. Médica, San Salvador', 4),
+    ('CLI-005', 'TechSolutions SV S.A.',  '2289-4400', 'info@techsolutions.sv',   'Zona Rosa, San Salvador', 2);
 GO
 
 
@@ -678,7 +681,6 @@ VALUES
     ('VEN-0002', 282.49, 3),
     ('VEN-0004', 329.58, 2);
 GO
-
 
 
 
