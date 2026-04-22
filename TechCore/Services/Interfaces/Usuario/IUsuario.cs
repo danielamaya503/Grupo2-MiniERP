@@ -22,5 +22,7 @@ namespace TechCore.Services.Interfaces.Usuario
 
         Task<(bool exito, string mensaje)> ActualizarPerfilAsync(UsuarioPerfilDTO dto);
         Task<(bool exito, string mensaje)> CambiarPasswordAsync(UsuarioCambiarPasswordDTO dto);
+
+        Task<string> GenerarCodigoAsync();
     }
 }

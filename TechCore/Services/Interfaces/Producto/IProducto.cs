@@ -15,5 +15,6 @@ namespace TechCore.Services.Interfaces.Producto
         Task<(bool exito, string mensaje)> EliminarAsync(string codProd);
 
         Task<List<ProductoListDTO>> BuscarParaCompraAsync(string termino);
+        Task<string> GenerarCodigoAsync();
     }
 }

@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using TechCore.Datos;
 using TechCore.Models;
-using Microsoft.EntityFrameworkCore;
 using TechCore.Models.DTO.Producto;
 using TechCore.Services.Interfaces.Producto;
+using TechCore.Services.Interfaces.Usuario;
 
 namespace TechCore.Controllers
 {
@@ -32,6 +33,8 @@ namespace TechCore.Controllers
             var lista = string.IsNullOrWhiteSpace(buscar)
                 ? await producto.ObtenerTodosAsync()
                 : await producto.BuscarAsync(buscar);
+
+            ViewBag.NuevoCodigo = await producto.GenerarCodigoAsync();
 
             await CargarCategoriasAsync();
 

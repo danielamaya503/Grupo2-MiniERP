@@ -169,15 +169,11 @@ namespace TechCore.Services.Concretes.Usuario
                 if (existeUsername)
                     return (false, $"El usuario {dto.Username} ya existe");
 
-                bool codeExiste = await context.Users
-                .AnyAsync(u => u.Code.ToLower() == dto.Code.ToLower());
-
-                if (existeUsername)
-                    return (false, $"El codigo {dto.Code} ya esta en uso");
+                var codigo = await GenerarCodigoAsync();
 
                 context.Add(new User
                 {
-                    Code = dto.Code.ToUpper(),
+                    Code = codigo,
                     Nombre = dto.Nombre,
                     Username = dto.Username,
                     password = BCrypt.Net.BCrypt.HashPassword(passwordDefault),
@@ -199,6 +195,26 @@ namespace TechCore.Services.Concretes.Usuario
                 return (false, "Ocurrio un erorr al crear el usuario");
             }
         }
+
+        public async Task<string> GenerarCodigoAsync()
+        {
+            var codigos = await context.Users
+               .Where(c => c.Code.StartsWith("USR-"))
+               .Select(c => c.Code)
+               .ToListAsync();
+
+            int maxNum = 0;
+
+            foreach (var cod in codigos)
+            {
+                var parte = cod[4..];
+                if (int.TryParse(parte, out int n) && n > maxNum)
+                    maxNum = n;
+            }
+
+            return $"USR-{(maxNum + 1):D3}";
+        }
+
 
         public async Task<(bool exito, string mensaje)> EditarAdminAsync(UsuarioEditAdminDTO dto)
         {

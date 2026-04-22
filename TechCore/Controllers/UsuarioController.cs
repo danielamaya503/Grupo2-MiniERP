@@ -35,6 +35,7 @@ namespace TechCore.Controllers
                 : await usuario.BuscarAsync(buscar);
 
             ViewBag.Top10 = await usuario.ObtenerTop10RecientesAsync();
+            ViewBag.NuevoCodigo = await usuario.GenerarCodigoAsync();
 
             await CargarRolesAsync();
 
@@ -66,10 +67,7 @@ namespace TechCore.Controllers
 
             var (exito, mensaje) = await usuario.CrearAsync(dto);
 
-            if (exito) TempData["Exito"] = mensaje;
-            else TempData["Error"] = mensaje;
-
-
+            TempData[exito ? "Exito" : "Error"] = mensaje;
             return RedirectToAction(nameof(Index));
         }
 

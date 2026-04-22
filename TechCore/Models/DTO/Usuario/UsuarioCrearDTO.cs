@@ -4,10 +4,7 @@ namespace TechCore.Models.DTO.Usuario
 {
     public class UsuarioCrearDTO
     {
-        [Required(ErrorMessage = "El código es requerido")]
-        [MaxLength(10, ErrorMessage = "Máximo 10 caracteres")]
-        [Display(Name = "Código")]
-        public string Code { get; set; } = string.Empty;
+        
 
         [Required(ErrorMessage = "El nombre es requerido")]
         [MaxLength(200)]

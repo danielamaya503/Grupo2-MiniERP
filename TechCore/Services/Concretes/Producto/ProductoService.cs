@@ -98,15 +98,11 @@ namespace TechCore.Services.Concretes.Producto
         {
             try
             {
-                var existe = await context.Productos
-                    .AnyAsync(p => p.Codprod.ToLower() == dto.CodProd.ToLower());
-
-                if (existe)
-                    return (false, $"El código '{dto.CodProd}' ya está en uso.");
+                var codigo = await GenerarCodigoAsync();
 
                 var nuevoProducto = new Models.Producto
                 {
-                    Codprod = dto.CodProd.ToUpper().Trim(),
+                    Codprod = codigo,
                     CodCategoria = dto.CodCategoria,
                     Descripcion = dto.Descripcion?.Trim(),
                     PrecioCompra = dto.PrecioCompra,
@@ -119,13 +115,33 @@ namespace TechCore.Services.Concretes.Producto
 
                 context.Productos.Add(nuevoProducto);
                 await context.SaveChangesAsync();
-                return (true, $"Producto '{dto.CodProd}' creado correctamente.");
+                return (true, $"Producto '{dto.Descripcion}' creado correctamente.");
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error al crear producto {CodProd}", dto.CodProd);
                 return (false, "Ocurrió un error al crear el producto.");
             }
+        }
+
+        public async Task<string> GenerarCodigoAsync() 
+        {
+
+            var codigos = await context.Productos
+              .Where(c => c.Codprod.StartsWith("PROD-"))
+              .Select(c => c.Codprod)
+              .ToListAsync();
+
+            int maxNum = 0;
+
+            foreach (var cod in codigos)
+            {
+                var parte = cod[5..];
+                if (int.TryParse(parte, out int n) && n > maxNum)
+                    maxNum = n;
+            }
+
+            return $"PROD-{(maxNum + 1):D3}";
         }
 
         public async Task<(bool exito, string mensaje)> EditarAsync(ProductoFormDTO dto)
