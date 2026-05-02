@@ -1,18 +1,23 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TechCore.Models;
 
+[Table("planPagos")]
 public partial class PlanPago
 {
-    public int Id { get; set; }
-
-    public string Norden { get; set; } = null!;
-
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    [Column("Id")]
+    public int IdPlanPago { get; set; }
+    [MaxLength(50)]
+    public string Norden { get; set; } = string.Empty;
     public int NumeroCuota { get; set; }
-
     public DateOnly FechaVencimiento { get; set; }
-
+    [Precision(18,2)]
     public decimal MontoCuota { get; set; }
 
     public bool? Pagada { get; set; }

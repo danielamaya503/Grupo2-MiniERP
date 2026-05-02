@@ -1,31 +1,36 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TechCore.Models;
 
+[Table("Compras")]
 public partial class Compra
 {
-    public string Norden { get; set; } = null!;
-
+    [Key]
+    [MaxLength(50)]
+    public string Norden { get; set; } = string.Empty;
     public int OrdenN { get; set; }
-
-    public string Codprov { get; set; } = null!;
-
+    [MaxLength(50)]
+    public string Codprov { get; set; } = string.Empty!;
     public int Codusu { get; set; }
 
-    public DateTime? Fecha { get; set; }
+    public DateTime? Fecha { get; set; } = DateTime.UtcNow;
 
     public decimal Subtotal { get; set; }
-
+    [Precision(18,2)]
     public decimal Iva { get; set; }
-
+    [Precision(18, 2)]
     public decimal Total { get; set; }
+    [Precision(18, 2)]
+    public int? Estado { get; set; } = 1;
 
-    public int? Estado { get; set; }
+    public  Proveedore? CodprovNavigation { get; set; } 
 
-    public virtual Proveedore CodprovNavigation { get; set; } = null!;
+    public  User? CodusuNavigation { get; set; }
 
-    public virtual User CodusuNavigation { get; set; } = null!;
+    public virtual List<ComprasDetalle> ComprasDetalles { get; set; } = [];
 
-    public virtual ICollection<ComprasDetalle> ComprasDetalles { get; set; } = new List<ComprasDetalle>();
 }

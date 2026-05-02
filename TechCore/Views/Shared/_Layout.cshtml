@@ -1,50 +1,340 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@using System.Security.Claims
+
+<!DOCTYPE html>
+<html class="light" lang="es">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - TechCore</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/TechCore.styles.css" asp-append-version="true" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+        darkMode: "class",
+        theme: {
+        extend: {
+        colors: {
+        "primary":           "#74c892",
+        "background-light":  "#f6f8f7",
+        "background-dark":   "#151d18",
+        "neutral-soft":      "#f1f3f2",
+        "border-soft":       "#dee3e0",
+        },
+        fontFamily: { "display": ["Inter", "sans-serif"] },
+        borderRadius: {
+        "DEFAULT": "0.25rem",
+        "lg":      "0.5rem",
+        "xl":      "0.75rem",
+        "full":    "9999px"
+        },
+        },
+        },
+        }
+    </script>
+    @* ✅ Favicon *@
+    <link rel="icon" type="image/png" href="@Url.Content("~/img/favicon.png?v=2")" />
+    <link rel="shortcut icon" href="@Url.Content("~/img/favicon.png?v=2")" />
+
+    <title>@ViewData["Title"] — TechCore</title>
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">TechCore</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+<body class="font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- OVERLAY — solo visible en móvil cuando sidebar     -->
+        <!-- está abierto. Click cierra el sidebar.             -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <div id="sidebar-overlay"
+             onclick="closeSidebar()"
+             class="fixed inset-0 bg-black/40 backdrop-blur-sm z-20 hidden lg:hidden">
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- SIDEBAR                                            -->
+        <!-- En móvil: se posiciona fixed y se desliza.        -->
+        <!-- En desktop (lg+): permanece visible siempre.      -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <aside id="sidebar"
+               class="fixed lg:relative inset-y-0 left-0 z-30
+            w-64 flex-shrink-0
+            border-r border-border-soft
+            bg-white dark:bg-background-dark
+            flex flex-col overflow-hidden
+            transform -translate-x-full lg:translate-x-0
+            transition-transform duration-300 ease-in-out">
+
+            <div class="p-6 flex flex-col gap-2 flex-1 overflow-y-auto">
+
+                <!-- Logo + botón cerrar (solo móvil) -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3 text-primary">
+                        <div class="flex items-center gap-3">
+                            <div class="w-11 h-11 bg-primary/15 border border-primary/10 rounded-xl
+                                flex items-center justify-center overflow-hidden p-1 shadow-sm">
+                                <img src="@Url.Content("~/img/techcore/logo-techcore.webp")"
+                                     alt="Logo TechCore"
+                                     class="w-full h-full object-contain" />
+                            </div>
+
+                            <h2 class="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 leading-none">
+                                TechCore
+                            </h2>
+                        </div>
+                    </div>
+                    <!-- Botón X solo visible en móvil -->
+                    <button onclick="closeSidebar()"
+                            class="lg:hidden p-1 rounded-lg text-slate-400 hover:bg-neutral-soft hover:text-slate-600 transition-colors">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <!-- Navegación -->
+                <nav class="flex flex-col gap-1">
+
+                    @* ── Dashboard — todos los roles ─────────────────── *@
+                    <a asp-controller="Home" asp-action="Index"
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-neutral-soft dark:text-slate-400 transition-colors
+                        @(ViewData["Active"]?.ToString() == "Dashboard" ? "bg-primary/10 text-primary font-semibold" : "")">
+                        <span class="material-symbols-outlined">dashboard</span>
+                        <span class="text-sm">Dashboard</span>
+                    </a>
+
+                    @* ══════════════════════════════════════════════════ *@
+                    @* ADMINISTRADOR                                     *@
+                    @* ══════════════════════════════════════════════════ *@
+                    @if (User.IsInRole("Administrador"))
+                    {
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 pt-4 pb-1">Administración</p>
+
+                        <a asp-controller="Cliente" asp-action="Index"
+                               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-neutral-soft dark:text-slate-400 transition-colors
+                            @(ViewData["Active"]?.ToString() == "Clientes" ? "bg-primary/10 text-primary font-semibold" : "")">
+                            <span class="material-symbols-outlined">group</span>
+                            <span class="text-sm">Clientes</span>
+                        </a>
+
+                        <a asp-controller="Proveedor" asp-action="Index"
+                               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-neutral-soft dark:text-slate-400 transition-colors
+                            @(ViewData["Active"]?.ToString() == "Proveedores" ? "bg-primary/10 text-primary font-semibold" : "")">
+                            <span class="material-symbols-outlined">local_shipping</span>
+                            <span class="text-sm">Proveedores</span>
+                        </a>
+
+                        <a asp-controller="Producto" asp-action="Index"
+                               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-neutral-soft dark:text-slate-400 transition-colors
+                            @(ViewData["Active"]?.ToString() == "Producto" ? "bg-primary/10 text-primary font-semibold" : "")">
+                            <span class="material-symbols-outlined">category</span>
+                            <span class="text-sm">Producto</span>
+                        </a>
+
+                        <a asp-controller="Usuario" asp-action="Index"
+                               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-neutral-soft dark:text-slate-400 transition-colors
+                            @(ViewData["Active"]?.ToString() == "Usuarios" ? "bg-primary/10 text-primary font-semibold" : "")">
+                            <span class="material-symbols-outlined">manage_accounts</span>
+                            <span class="text-sm">Usuarios</span>
+                        </a>
+                    }
+
+                    @* ══════════════════════════════════════════════════ *@
+                    @* VENDEDOR                                          *@
+                    @* ══════════════════════════════════════════════════ *@
+                    @if (User.IsInRole("Vendedor"))
+                    {
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 pt-4 pb-1">Ventas</p>
+
+                        <a asp-controller="Ventas" asp-action="Index"
+                               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-neutral-soft dark:text-slate-400 transition-colors
+                            @(ViewData["Active"]?.ToString() == "Ventas" ? "bg-primary/10 text-primary font-semibold" : "")">
+                            <span class="material-symbols-outlined">trending_up</span>
+                            <span class="text-sm">Ventas</span>
+                        </a>
+
+                        <a asp-controller="Inventario" asp-action="Index"
+                               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-neutral-soft dark:text-slate-400 transition-colors
+                            @(ViewData["Active"]?.ToString() == "Inventario" ? "bg-primary/10 text-primary font-semibold" : "")">
+                            <span class="material-symbols-outlined">warehouse</span>
+                            <span class="text-sm">Inventario</span>
+                        </a>
+
+                        <a asp-controller="Cliente" asp-action="Index"
+                               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-neutral-soft dark:text-slate-400 transition-colors
+                            @(ViewData["Active"]?.ToString() == "Clientes" ? "bg-primary/10 text-primary font-semibold" : "")">
+                            <span class="material-symbols-outlined">group</span>
+                            <span class="text-sm">Clientes</span>
+                        </a>
+                    }
+
+                    @* ══════════════════════════════════════════════════ *@
+                    @* BODEGA                                            *@
+                    @* ══════════════════════════════════════════════════ *@
+                    @if (User.IsInRole("Bodega"))
+                    {
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 pt-4 pb-1">Bodega</p>
+
+                        <a asp-controller="Producto" asp-action="Index"
+                               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-neutral-soft dark:text-slate-400 transition-colors
+                            @(ViewData["Active"]?.ToString() == "Producto" ? "bg-primary/10 text-primary font-semibold" : "")">
+                            <span class="material-symbols-outlined">category</span>
+                            <span class="text-sm">Producto</span>
+                        </a>
+
+                        <a asp-controller="Proveedor" asp-action="Index"
+                               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-neutral-soft dark:text-slate-400 transition-colors
+                            @(ViewData["Active"]?.ToString() == "Proveedores" ? "bg-primary/10 text-primary font-semibold" : "")">
+                            <span class="material-symbols-outlined">local_shipping</span>
+                            <span class="text-sm">Proveedores</span>
+                        </a>
+
+                        <a asp-controller="Compras" asp-action="Index"
+                               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-neutral-soft dark:text-slate-400 transition-colors
+                            @(ViewData["Active"]?.ToString() == "Compras" ? "bg-primary/10 text-primary font-semibold" : "")">
+                            <span class="material-symbols-outlined">inventory_2</span>
+                            <span class="text-sm">Compras</span>
+                        </a>
+
+                        <a asp-controller="Movimiento" asp-action="Index"
+                               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-neutral-soft dark:text-slate-400 transition-colors
+                            @(ViewData["Active"]?.ToString() == "Movimientos" ? "bg-primary/10 text-primary font-semibold" : "")">
+                            <span class="material-symbols-outlined">swap_vert</span>
+                            <span class="text-sm">Movimientos</span>
+                        </a>
+                    }
+
+                    @* ══════════════════════════════════════════════════ *@
+                    @* CONTADOR                                          *@
+                    @* ══════════════════════════════════════════════════ *@
+                    @if (User.IsInRole("Contador"))
+                    {
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 pt-4 pb-1">Contabilidad</p>
+
+                        <a asp-controller="CuentasCobrar" asp-action="Index"
+                               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-neutral-soft dark:text-slate-400 transition-colors
+                            @(ViewData["Active"]?.ToString() == "CuentasCobrar" ? "bg-primary/10 text-primary font-semibold" : "")">
+                            <span class="material-symbols-outlined">payments</span>
+                            <span class="text-sm">Cuentas por Cobrar</span>
+                        </a>
+
+                        <a asp-controller="CuentasPagar" asp-action="Index"
+                               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-neutral-soft dark:text-slate-400 transition-colors
+                            @(ViewData["Active"]?.ToString() == "CuentasPagar" ? "bg-primary/10 text-primary font-semibold" : "")">
+                            <span class="material-symbols-outlined">receipt_long</span>
+                            <span class="text-sm">Cuentas por Pagar</span>
+                        </a>
+
+                        <a asp-controller="Reportes" asp-action="Index"
+                               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-neutral-soft dark:text-slate-400 transition-colors
+                            @(ViewData["Active"]?.ToString() == "Reportes" ? "bg-primary/10 text-primary font-semibold" : "")">
+                            <span class="material-symbols-outlined">bar_chart</span>
+                            <span class="text-sm">Reportes</span>
+                        </a>
+                    }
+
+                    @* ── Perfil — todos los roles ─────────────────────── *@
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 pt-4 pb-1">Cuenta</p>
+
+                    <a asp-action="Perfil" asp-controller="Usuario"
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-neutral-soft dark:text-slate-400 transition-colors
+                        @(ViewData["Active"]?.ToString() == "Perfil" ? "bg-primary/10 text-primary font-semibold" : "")">
+                        <span class="material-symbols-outlined">account_circle</span>
+                        <div class="flex flex-col min-w-0">
+                            <span class="text-sm truncate">@User.Identity?.Name</span>
+                            <span class="text-xs text-slate-400 truncate">@User.FindFirst(ClaimTypes.Role)?.Value</span>
+                        </div>
+                    </a>
+
+                </nav>
+            </div>
+
+            <!-- Footer del sidebar — perfil + logout -->
+            <div class="p-4 border-t border-border-soft">
+                <div class="flex items-center gap-3 p-2 rounded-xl bg-neutral-soft/50">
+                    <div class="size-10 rounded-full bg-primary/30 flex-shrink-0 flex items-center justify-center">
+                        <span class="text-primary font-bold text-sm">
+                            @(User.Identity?.Name?.Substring(0, 1).ToUpper() ?? "U")
+                        </span>
+                    </div>
+                    <div class="flex flex-col min-w-0">
+                        <h3 class="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">
+                            @User.Identity?.Name
+                        </h3>
+                        <p class="text-xs text-slate-500 truncate">
+                            @User.FindFirst(ClaimTypes.Role)?.Value
+                        </p>
+                    </div>
+                    <form asp-action="Logout" asp-controller="Account" method="post" class="ml-auto">
+                        @Html.AntiForgeryToken()
+                        <button type="submit"
+                                title="Cerrar sesión"
+                                class="text-slate-400 hover:text-red-500 transition-colors">
+                            <span class="material-symbols-outlined text-[20px]">logout</span>
+                        </button>
+                    </form>
                 </div>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
+        </aside>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- CONTENIDO PRINCIPAL                               -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <main class="flex-1 flex flex-col overflow-y-auto min-w-0">
+
+            <!-- Header superior -->
+            <header class="h-16 flex items-center justify-between px-4 md:px-8 border-b border-border-soft bg-white/80 dark:bg-background-dark/80 backdrop-blur-md sticky top-0 z-10">
+
+                <div class="flex items-center gap-3">
+                    <!-- ☰ Botón hamburguesa — solo visible en móvil -->
+                    <button onclick="openSidebar()"
+                            class="lg:hidden p-2 rounded-lg text-slate-500 hover:bg-neutral-soft transition-colors">
+                        <span class="material-symbols-outlined">menu</span>
+                    </button>
+
+                    <h1 class="text-base md:text-lg font-bold text-slate-800 dark:text-slate-200 truncate">
+                        @ViewData["Title"]
+                    </h1>
+                </div>
+
+            </header>
+
+            <!-- Contenido de cada vista -->
+            <div class="p-4 md:p-8">
+                @RenderBody()
+            </div>
+
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - TechCore - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        const sidebar  = document.getElementById('sidebar');
+        const overlay  = document.getElementById('sidebar-overlay');
+
+        function openSidebar() {
+        sidebar.classList.remove('-translate-x-full');
+        sidebar.classList.add('translate-x-0');
+        overlay.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+        }
+
+        function closeSidebar() {
+        sidebar.classList.add('-translate-x-full');
+        sidebar.classList.remove('translate-x-0');
+        overlay.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+        }
+
+        // Cierra el sidebar al navegar (click en cualquier enlace del sidebar)
+        sidebar.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+        if (window.innerWidth < 1024) closeSidebar();
+        });
+        });
+
+        // Cierra el sidebar si la ventana se agranda a desktop
+        window.addEventListener('resize', () => {
+        if (window.innerWidth >= 1024) closeSidebar();
+        });
+    </script>
 </body>
 </html>

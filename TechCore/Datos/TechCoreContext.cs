@@ -46,7 +46,7 @@ public partial class TechCoreContext : DbContext
     {
         modelBuilder.Entity<AbonosVenta>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__abonosVe__3213E83F5337B15E");
+            entity.HasKey(e => e.IdAbonosVenta).HasName("PK__abonosVe__3213E83F5337B15E");
 
             entity.ToTable("abonosVentas", tb => tb.HasTrigger("TR_ActualizarSaldo"));
 
@@ -54,7 +54,7 @@ public partial class TechCoreContext : DbContext
 
             entity.HasIndex(e => e.Norden, "IDX_abonosVentas_norden");
 
-            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.IdAbonosVenta).HasColumnName("id");
             entity.Property(e => e.Fecha)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime")
@@ -148,6 +148,13 @@ public partial class TechCoreContext : DbContext
                 .HasMaxLength(15)
                 .IsUnicode(false)
                 .HasColumnName("telefono");
+
+            entity.HasOne(c => c.CreadorNavigation)   
+               .WithMany(u => u.ClientesCreados)           
+               .HasForeignKey(c => c.idCreador)     
+               .OnDelete(DeleteBehavior.ClientSetNull)
+               .HasConstraintName("FK_clientes_users");
+
         });
 
         modelBuilder.Entity<Compra>(entity =>
@@ -204,7 +211,7 @@ public partial class TechCoreContext : DbContext
 
         modelBuilder.Entity<ComprasDetalle>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__comprasD__3213E83F534A4F1B");
+            entity.HasKey(e => e.IdComprasDetalle).HasName("PK__comprasD__3213E83F534A4F1B");
 
             entity.ToTable("comprasDetalle");
 
@@ -212,7 +219,7 @@ public partial class TechCoreContext : DbContext
 
             entity.HasIndex(e => e.Norden, "IDX_comprasDetalle_norden");
 
-            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.IdComprasDetalle).HasColumnName("id");
             entity.Property(e => e.Cantidad).HasColumnName("cantidad");
             entity.Property(e => e.Codprod)
                 .HasMaxLength(50)
@@ -241,7 +248,7 @@ public partial class TechCoreContext : DbContext
 
         modelBuilder.Entity<PlanPago>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__planPago__3213E83FA05E11F1");
+            entity.HasKey(e => e.IdPlanPago).HasName("PK__planPago__3213E83FA05E11F1");
 
             entity.ToTable("planPagos");
 
@@ -251,7 +258,7 @@ public partial class TechCoreContext : DbContext
 
             entity.HasIndex(e => e.Pagada, "IDX_planPagos_pagada").HasFilter("([pagada]=(0))");
 
-            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.IdPlanPago).HasColumnName("id");
             entity.Property(e => e.FechaVencimiento).HasColumnName("fechaVencimiento");
             entity.Property(e => e.MontoCuota)
                 .HasColumnType("decimal(18, 2)")
@@ -359,13 +366,13 @@ public partial class TechCoreContext : DbContext
 
         modelBuilder.Entity<Rol>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__rol__3213E83F860D590C");
+            entity.HasKey(e => e.IdRol).HasName("PK__rol__3213E83F860D590C");
 
             entity.ToTable("rol");
 
             entity.HasIndex(e => e.Habilitado, "IDX_rol_habilitado");
 
-            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.IdRol).HasColumnName("id");
             entity.Property(e => e.Habilitado)
                 .HasDefaultValue(true)
                 .HasColumnName("habilitado");
@@ -377,7 +384,7 @@ public partial class TechCoreContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__users__3213E83FD31B69EA");
+            entity.HasKey(e => e.IdUser).HasName("PK__users__3213E83FD31B69EA");
 
             entity.ToTable("users");
 
@@ -389,7 +396,7 @@ public partial class TechCoreContext : DbContext
 
             entity.HasIndex(e => e.Username, "UQ__users__F3DBC5729B3AF7EE").IsUnique();
 
-            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.IdUser).HasColumnName("id");
             entity.Property(e => e.Code)
                 .HasMaxLength(10)
                 .IsUnicode(false)
@@ -411,7 +418,7 @@ public partial class TechCoreContext : DbContext
                 .HasMaxLength(15)
                 .IsUnicode(false)
                 .HasColumnName("phone");
-            entity.Property(e => e.Pwd)
+            entity.Property(e => e.password)
                 .IsUnicode(false)
                 .HasColumnName("pwd");
             entity.Property(e => e.Username)
@@ -497,7 +504,7 @@ public partial class TechCoreContext : DbContext
 
         modelBuilder.Entity<VentasDetalle>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__ventasDe__3213E83F71F52647");
+            entity.HasKey(e => e.IdVentasDetalle).HasName("PK__ventasDe__3213E83F71F52647");
 
             entity.ToTable("ventasDetalle", tb => tb.HasTrigger("TR_DisminuirStock"));
 
@@ -505,7 +512,7 @@ public partial class TechCoreContext : DbContext
 
             entity.HasIndex(e => e.Norden, "IDX_ventasDetalle_norden");
 
-            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.IdVentasDetalle).HasColumnName("id");
             entity.Property(e => e.Cantidad).HasColumnName("cantidad");
             entity.Property(e => e.Codprod)
                 .HasMaxLength(50)

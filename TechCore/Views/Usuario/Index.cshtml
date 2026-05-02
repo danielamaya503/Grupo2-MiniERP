@@ -1,0 +1,530 @@
+﻿@model List<TechCore.Models.DTO.Usuario.UsuarioListDTO>
+@using System.Web
+@{
+    ViewData["Title"] = "Gestión de Usuarios";
+    ViewData["Active"] = "Usuarios";
+    var buscar = ViewData["Buscar"]?.ToString() ?? "";
+}
+
+<div class="max-w-5xl mx-auto w-full space-y-8">
+
+    <div class="space-y-1">
+        <h2 class="text-3xl font-black text-slate-900 dark:text-slate-100">Gestión de Usuarios</h2>
+        <p class="text-slate-500">Administra los usuarios del sistema, sus roles y accesos.</p>
+    </div>
+
+    @* ── Alertas TempData ──────────────────────────────── *@
+    @if (TempData["Exito"] != null)
+    {
+        <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center gap-3">
+            <span class="material-symbols-outlined text-emerald-600">check_circle</span>
+            <p class="text-sm font-bold text-emerald-700">@TempData["Exito"]</p>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="p-4 rounded-xl bg-red-50 border border-red-200 flex items-center gap-3">
+            <span class="material-symbols-outlined text-red-500">error</span>
+            <p class="text-sm font-bold text-red-700">@TempData["Error"]</p>
+        </div>
+    }
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        @* ══ TABLA PRINCIPAL ══════════════════════════════ *@
+        <div class="lg:col-span-2 space-y-8">
+            <section class="bg-white dark:bg-background-dark rounded-xl border border-border-soft overflow-hidden shadow-sm">
+                <div class="p-6 border-b border-border-soft flex flex-wrap items-center justify-between gap-4">
+                    <h3 class="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">manage_accounts</span>
+                        Usuarios del Sistema
+                    </h3>
+
+                    @* Búsqueda GET *@
+                    <form asp-action="Index" asp-controller="Usuario" method="get" class="flex items-center gap-2">
+                        <div class="relative">
+                            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-base">search</span>
+                            <input name="buscar" value="@buscar" type="text"
+                                   placeholder="Buscar usuario..."
+                                   class="pl-9 pr-4 py-1.5 bg-neutral-soft border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/50 w-52" />
+                        </div>
+                        <button type="submit"
+                                class="px-3 py-1.5 bg-primary/10 text-primary text-xs font-bold rounded-lg hover:bg-primary/20 transition-colors">
+                            Buscar
+                        </button>
+                        @if (!string.IsNullOrWhiteSpace(buscar))
+                        {
+                            <a asp-action="Index" asp-controller="Usuario"
+                               class="px-3 py-1.5 bg-slate-100 text-slate-500 text-xs font-bold rounded-lg hover:bg-slate-200 transition-colors">
+                                Limpiar
+                            </a>
+                        }
+                    </form>
+
+                    @* Botón nuevo usuario — llama función global window.abrirModalCrear *@
+                    <button type="button" onclick="window.abrirModalCrear()"
+                            class="flex items-center gap-2 px-3 py-1.5 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primary/90 transition-colors shadow-sm">
+                        <span class="material-symbols-outlined text-sm">person_add</span>
+                        Nuevo Usuario
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-neutral-soft/50 text-slate-500 text-[10px] font-bold uppercase tracking-wider">
+                            <tr>
+                                <th class="px-6 py-3">Usuario</th>
+                                <th class="px-6 py-3">Código</th>
+                                <th class="px-6 py-3">Rol</th>
+                                <th class="px-6 py-3">Contacto</th>
+                                <th class="px-6 py-3 text-right">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-border-soft">
+                            @if (!Model.Any())
+                            {
+                                <tr>
+                                    <td colspan="5" class="px-6 py-10 text-center text-sm text-slate-400">
+                                        No se encontraron usuarios
+                                    </td>
+                                </tr>
+                            }
+                            @foreach (var u in Model)
+                            {
+                                @* ── Escapamos cada string con JavaScriptStringEncode
+                                   para evitar que apóstrofes o comillas rompan el JS ── *@
+                                var jsNombre   = HttpUtility.JavaScriptStringEncode(u.Nombre);
+                                var jsEmail    = HttpUtility.JavaScriptStringEncode(u.Email   ?? "");
+                                var jsPhone    = HttpUtility.JavaScriptStringEncode(u.Phone   ?? "");
+                                var jsUsername = HttpUtility.JavaScriptStringEncode(u.Username);
+                                var jsCode     = HttpUtility.JavaScriptStringEncode(u.Code);
+
+                                <tr class="hover:bg-neutral-soft/30 transition-colors">
+
+                                    <td class="px-6 py-3">
+                                        <div class="flex items-center gap-3">
+                                            <div class="size-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                                                <span class="text-primary text-xs font-bold">
+                                                    @u.Nombre.Substring(0, 1).ToUpper()
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs font-bold text-slate-800 dark:text-slate-100">@u.Nombre</p>
+                                                <p class="text-[10px] text-slate-400">@u.Username</p>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td class="px-6 py-3">
+                                        <span class="text-xs font-mono text-slate-600 bg-neutral-soft px-2 py-0.5 rounded">
+                                            @u.Code
+                                        </span>
+                                    </td>
+
+                                    <td class="px-6 py-3">
+                                        @{
+                                            var rolColor = u.NombreRol switch
+                                            {
+                                                "Administrador" => "bg-purple-100 text-purple-700",
+                                                "Vendedor"      => "bg-blue-100 text-blue-700",
+                                                "Bodega"        => "bg-orange-100 text-orange-700",
+                                                "Contador"      => "bg-emerald-100 text-emerald-700",
+                                                _               => "bg-slate-100 text-slate-600"
+                                            };
+                                        }
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold @rolColor">
+                                            @u.NombreRol
+                                        </span>
+                                    </td>
+
+                                    <td class="px-6 py-3">
+                                        <p class="text-xs text-slate-600">@(u.Email ?? "—")</p>
+                                        <p class="text-[10px] text-slate-400">@(u.Phone ?? "—")</p>
+                                    </td>
+
+                                    <td class="px-6 py-3 text-right">
+                                        <div class="flex items-center justify-end gap-1">
+
+                                            @* Botón editar — data-* ya escapados con JavaScriptStringEncode *@
+                                            <button type="button"
+                                                    data-id="@u.Id"
+                                                    data-nombre="@jsNombre"
+                                                    data-email="@jsEmail"
+                                                    data-phone="@jsPhone"
+                                                    data-idrol="@u.IdRol"
+                                                    data-username="@jsUsername"
+                                                    data-code="@jsCode"
+                                                    onclick="window.abrirModalEditar(this)"
+                                                    title="Editar usuario"
+                                                    class="p-1.5 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors">
+                                                <span class="material-symbols-outlined text-lg">edit</span>
+                                            </button>
+
+                                            @* Botón reset — nombre escapado para JS *@
+                                            <button type="button"
+                                                    onclick="window.abrirModalReset(@u.Id, '@jsNombre')"
+                                                    title="Restablecer contraseña"
+                                                    class="p-1.5 text-slate-400 hover:text-orange-500 hover:bg-orange-50 rounded-lg transition-colors">
+                                                <span class="material-symbols-outlined text-lg">lock_reset</span>
+                                            </button>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        @* ══ TOP 10 RECIENTES ═════════════════════════════ *@
+        <div class="space-y-8">
+            <section class="bg-white dark:bg-background-dark rounded-xl border border-border-soft overflow-hidden shadow-sm">
+                <div class="p-6 border-b border-border-soft">
+                    <h3 class="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">history</span>
+                        Últimos 10 Creados
+                    </h3>
+                </div>
+                <div class="p-4 space-y-2">
+                    @if (ViewBag.Top10 is List<TechCore.Models.DTO.Usuario.UsuarioListDTO> top10 && top10.Any())
+                    {
+                        @foreach (var u in top10)
+                        {
+                            <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-neutral-soft/50 transition-colors">
+                                <div class="size-7 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                                    <span class="text-primary text-[10px] font-bold">
+                                        @u.Nombre.Substring(0, 1).ToUpper()
+                                    </span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs font-bold text-slate-800 truncate">@u.Nombre</p>
+                                    <p class="text-[10px] text-slate-400">@u.NombreRol</p>
+                                </div>
+                                <span class="text-[10px] text-slate-400 flex-shrink-0">
+                                    @u.CreatedDate.Value.ToString("dd/MM/yy")
+                                </span>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-xs text-slate-400 text-center py-4">Sin registros</p>
+                    }
+                </div>
+            </section>
+        </div>
+
+    </div>
+</div>
+
+@* ════════════════════════════════════════════════════════ *@
+@* MODAL — CREAR USUARIO                                   *@
+@* ════════════════════════════════════════════════════════ *@
+<div id="modalCrear"
+     class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div class="bg-white dark:bg-background-dark rounded-xl shadow-xl border border-border-soft w-full max-w-lg mx-4">
+
+        <div class="p-6 border-b border-border-soft flex items-center justify-between">
+            <h3 class="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">person_add</span>
+                Nuevo Usuario
+            </h3>
+            <button type="button" onclick="window.cerrarModal('modalCrear')"
+                    class="text-slate-400 hover:text-slate-600 transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <form asp-action="Crear" asp-controller="Usuario" method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-widest">
+                        Código (autogenerado)
+                    </label>
+                    <div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-800
+                        border border-slate-200 dark:border-slate-700
+                        rounded-lg px-3 py-2.5">
+                        <span class="material-symbols-outlined text-primary text-base">badge</span>
+                        <span class="font-mono font-bold text-primary text-sm">
+                            @ViewBag.NuevoCodigo
+                        </span>
+                        <span class="ml-auto text-[10px] text-slate-400 uppercase tracking-widest">
+                            autogenerado
+                        </span>
+                    </div>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Nombre Completo *</label>
+                    <input name="Nombre" id="crearNombre" type="text" required placeholder="Juan Delgado"
+                           class="w-full px-3 py-2 bg-neutral-soft border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/50" />
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Usuario *</label>
+                    <input name="Username" id="crearUserName" type="text" required placeholder="jdelgado"
+                           class="w-full px-3 py-2 bg-neutral-soft border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/50" />
+                    <p class="text-[11px] text-slate-400">Debe ser único</p>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Correo</label>
+                    <input name="Email" id="crearEmail" type="email" placeholder="j@techcore.com"
+                           class="w-full px-3 py-2 bg-neutral-soft border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/50" />
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Teléfono</label>
+                    <input name="Phone" type="text" placeholder="7000-0000"
+                           class="w-full px-3 py-2 bg-neutral-soft border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/50" />
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Rol *</label>
+                    <select name="IdRol" required asp-items="ViewBag.Roles"
+                            class="w-full px-3 py-2 bg-neutral-soft border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/50">
+                        <option value="">— Seleccionar —</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="mx-6 mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2">
+                <span class="material-symbols-outlined text-amber-500 text-lg">info</span>
+                <p class="text-xs text-amber-700">
+                    Contraseña inicial:
+                    <code class="bg-amber-100 px-1.5 py-0.5 rounded font-mono font-bold ml-1">TechCore!2026</code>
+                </p>
+            </div>
+
+            <div class="px-6 py-4 bg-neutral-soft/30 border-t border-border-soft flex justify-end gap-3">
+                <button type="button" onclick="window.cerrarModal('modalCrear')"
+                        class="px-4 py-2 text-sm font-bold text-slate-600 bg-white border border-border-soft rounded-lg hover:bg-slate-50 transition-colors">
+                    Cancelar
+                </button>
+                <button type="submit"
+                        class="flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-primary/90 transition-colors">
+                    <span class="material-symbols-outlined text-sm">person_add</span>
+                    Crear Usuario
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@* ════════════════════════════════════════════════════════ *@
+@* MODAL — EDITAR USUARIO                                  *@
+@* ════════════════════════════════════════════════════════ *@
+<div id="modalEditar"
+     class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div class="bg-white dark:bg-background-dark rounded-xl shadow-xl border border-border-soft w-full max-w-lg mx-4">
+
+        <div class="p-6 border-b border-border-soft flex items-center justify-between">
+            <h3 class="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">edit</span>
+                Editar Usuario —
+                <span id="editarBadge" class="text-xs font-mono text-slate-400 font-normal"></span>
+            </h3>
+            <button type="button" onclick="window.cerrarModal('modalEditar')"
+                    class="text-slate-400 hover:text-slate-600 transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <form asp-action="Editar" asp-controller="Usuario" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="Id" id="editarId" />
+
+            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Nombre Completo *</label>
+                    <input type="text" name="Nombre" id="editarNombre" required
+                           class="w-full px-3 py-2 bg-neutral-soft border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/50" />
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Correo</label>
+                    <input type="email" name="Email" id="editarEmail"
+                           class="w-full px-3 py-2 bg-neutral-soft border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/50" />
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Teléfono</label>
+                    <input type="text" name="Phone" id="editarPhone"
+                           class="w-full px-3 py-2 bg-neutral-soft border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/50" />
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Rol *</label>
+                    <select name="IdRol" id="editarIdRol" required asp-items="ViewBag.Roles"
+                            class="w-full px-3 py-2 bg-neutral-soft border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/50">
+                        <option value="">— Seleccionar —</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="px-6 py-4 bg-neutral-soft/30 border-t border-border-soft flex items-center justify-between">
+                <button type="button" id="btnResetDesdeEditar"
+                        class="flex items-center gap-2 px-3 py-2 text-orange-600 bg-orange-50 border border-orange-200 text-xs font-bold rounded-lg hover:bg-orange-100 transition-colors">
+                    <span class="material-symbols-outlined text-sm">lock_reset</span>
+                    Restablecer contraseña
+                </button>
+                <div class="flex gap-3">
+                    <button type="button" onclick="window.cerrarModal('modalEditar')"
+                            class="px-4 py-2 text-sm font-bold text-slate-600 bg-white border border-border-soft rounded-lg hover:bg-slate-50 transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                            class="flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-primary/90 transition-colors">
+                        <span class="material-symbols-outlined text-sm">save</span>
+                        Guardar Cambios
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@* ════════════════════════════════════════════════════════ *@
+@* MODAL — RESTABLECER CONTRASEÑA                          *@
+@* ════════════════════════════════════════════════════════ *@
+<div id="modalReset"
+     class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div class="bg-white dark:bg-background-dark rounded-xl shadow-xl border border-border-soft w-full max-w-sm mx-4 p-6 space-y-4">
+        <div class="flex items-center gap-3">
+            <div class="p-2 bg-orange-100 rounded-lg">
+                <span class="material-symbols-outlined text-orange-600">lock_reset</span>
+            </div>
+            <h3 class="font-bold text-slate-900 dark:text-slate-100">Restablecer Contraseña</h3>
+        </div>
+        <p class="text-sm text-slate-500">
+            ¿Restablecer contraseña de
+            <span id="resetNombre" class="font-bold text-slate-700"></span>?
+            Se asignará
+            <code class="bg-neutral-soft px-1.5 rounded font-mono text-primary font-bold">TechCore!2026</code>.
+        </p>
+        <form asp-action="Restablecer" asp-controller="Usuario" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" id="resetUserId" />
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="window.cerrarModal('modalReset')"
+                        class="px-4 py-2 text-sm font-bold text-slate-600 bg-neutral-soft rounded-lg hover:bg-slate-200 transition-colors">
+                    Cancelar
+                </button>
+                <button type="submit"
+                        class="px-4 py-2 text-sm font-bold text-white bg-orange-500 rounded-lg hover:bg-orange-600 transition-colors">
+                    Restablecer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    // ── Utilidades internas ────────────────────────────
+    function abrirModal(id)  { document.getElementById(id).classList.remove('hidden'); }
+    function cerrarModalInt(id) { document.getElementById(id).classList.add('hidden'); }
+
+    // Cierra cualquier modal al hacer clic en el fondo oscuro
+    document.querySelectorAll('[id^="modal"]').forEach(function(m) {
+        m.addEventListener('click', function(e) {
+            if (e.target === m) cerrarModalInt(m.id);
+        });
+    });
+
+    // Código en mayúsculas mientras escribe
+    var inputCode = document.getElementById('crearCode');
+    if (inputCode) {
+        inputCode.addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+        });
+    }
+
+    // ══════════════════════════════════════════════════
+    // Funciones expuestas globalmente con window.*
+    // → necesario porque los onclick="" del HTML no pueden
+    //   acceder a funciones declaradas dentro de un bloque
+    // ══════════════════════════════════════════════════
+
+    // ── Cerrar modal (llamado desde botones X y Cancelar) ──
+    window.cerrarModal = function(id) {
+        cerrarModalInt(id);
+    };
+
+    // ── Modal Crear ────────────────────────────────────
+    window.abrirModalCrear = function() {
+        // Limpia todos los campos antes de abrir
+        document.querySelector('#modalCrear form').reset();
+        abrirModal('modalCrear');
+    };
+
+    // ── Modal Editar ───────────────────────────────────
+    // Recibe el botón, lee sus data-* y rellena el formulario
+    window.abrirModalEditar = function(btn) {
+        var id       = btn.getAttribute('data-id');
+        var nombre   = btn.getAttribute('data-nombre');
+        var email    = btn.getAttribute('data-email');
+        var phone    = btn.getAttribute('data-phone');
+        var idRol    = btn.getAttribute('data-idrol');
+        var username = btn.getAttribute('data-username');
+        var code     = btn.getAttribute('data-code');
+
+        // Rellena los campos del formulario de edición
+        document.getElementById('editarId').value       = id;
+        document.getElementById('editarNombre').value   = nombre;
+        document.getElementById('editarEmail').value    = email;
+        document.getElementById('editarPhone').value    = phone;
+        document.getElementById('editarIdRol').value    = idRol;
+        document.getElementById('editarBadge').textContent = code + ' — ' + username;
+
+        // El botón "Restablecer Pwd" dentro del modal de edición
+        // cierra este modal y abre el de reset con los mismos datos
+        document.getElementById('btnResetDesdeEditar').onclick = function() {
+            cerrarModalInt('modalEditar');
+            window.abrirModalReset(id, nombre);
+        };
+
+        abrirModal('modalEditar');
+    };
+
+    // ── Modal Restablecer ──────────────────────────────
+    window.abrirModalReset = function(id, nombre) {
+        document.getElementById('resetUserId').value       = id;
+        document.getElementById('resetNombre').textContent = nombre;
+        abrirModal('modalReset');
+    };
+
+    // ── Webhook Make al crear usuario ──────────────────────
+    var formCrear = document.querySelector('#modalCrear form');
+
+    if (formCrear) {
+        formCrear.addEventListener('submit', function () {
+            var nombre = document.getElementById('crearNombre').value.trim();
+            var userName  = document.getElementById('crearUserName').value.trim();
+            var email  = document.getElementById('crearEmail').value.trim();
+
+            if (nombre && email && userName) {
+                var webhookUrl = 'https://hook.us2.make.com/pr3exd8znlanhhtbgerxzpsi7sbc7rpx';
+                var url = webhookUrl
+                    + '?name='  + encodeURIComponent(nombre)
+                    + '&userName=' + encodeURIComponent(userName)
+                    + '&email=' + encodeURIComponent(email);
+
+                window.open(url, '_blank'); // 👈 abre confirmación en nueva pestaña
+            }
+        });
+    }
+
+});
+</script>
+}
