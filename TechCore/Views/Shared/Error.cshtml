@@ -1,0 +1,108 @@
+﻿@{
+    ViewData["Title"] = "Página no encontrada";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html class="dark" lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TechCore - 404 Página no encontrada</title>
+    <link rel="icon" type="image/png" href="@Url.Content("~/img/perfil-del-usuario.png?v=2")" />
+    <link rel="stylesheet" href="@Url.Content("~/css/error404.css")" />
+    <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body {
+                min-height: 100vh;
+                background: #0f0f1a;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            }
+    </style>
+</head>
+<body>
+
+    <div class="error-card-404">
+        <div class="astronaut-section-404">
+            <div class="cable-404"></div>
+            <div class="astronaut-404">
+                <div class="backpack-404"></div>
+                <div class="helmet-404">
+                    <div class="visor-404"></div>
+                </div>
+                <div class="body-404">
+                    <div class="chest-panel-404">
+                        <div class="light-404 light-red-404"></div>
+                        <div class="light-404 light-green-404"></div>
+                        <div class="light-404 light-blue-404"></div>
+                    </div>
+                </div>
+                <div class="arm-left-404"></div>
+                <div class="arm-right-404"></div>
+                <div class="leg-left-404"></div>
+                <div class="leg-right-404"></div>
+            </div>
+        </div>
+
+        <div class="content-section-404">
+            <div class="error-code-404">404</div>
+            <div class="error-title-404">Perdido en el espacio</div>
+            <div class="error-message-404">
+                Dogy, tenemos un problema. La página que buscas
+                se ha perdido en el espacio profundo.
+            </div>
+        </div>
+
+        <div class="search-section-404">
+            <div class="search-box-404">
+                <input type="text" placeholder="Buscar..." class="search-input-404" />
+                <button class="search-btn-404">
+                    <svg viewBox="0 0 24 24" width="16" height="16">
+                        <path fill="currentColor"
+                              d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="buttons-section-404">
+            <a href="@Url.Action("Index", "Home")" class="btn-404 btn-primary-404">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                Ir al inicio
+            </a>
+            <button class="btn-404 btn-secondary-404" onclick="history.back()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2">
+                    <polyline points="23 4 23 10 17 10"></polyline>
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                </svg>
+                Volver
+            </button>
+        </div>
+
+
+        <div class="glow-bg-404"></div>
+        <div class="stars-404">
+            <span class="star-404"></span>
+            <span class="star-404"></span>
+            <span class="star-404"></span>
+            <span class="star-404"></span>
+            <span class="star-404"></span>
+            <span class="star-404"></span>
+            <span class="star-404"></span>
+            <span class="star-404"></span>
+            <span class="star-404"></span>
+            <span class="star-404"></span>
+        </div>
+    </div>
+
+</body>
+</html>
